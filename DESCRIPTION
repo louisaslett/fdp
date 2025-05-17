@@ -1,0 +1,21 @@
+Package: fdp
+Title: f-Differential Privacy and Gaussian Differential Privacy
+Version: 0.0.1
+Authors@R: 
+    person("Louis", "Aslett", role = c("aut", "cre"),
+           email = "louis.aslett@durham.ac.uk",
+           comment = c(ORCID = "0000-0003-2211-233X"))
+Description: Visualisation and construction of trade-off functions for
+    f-differential privacy (f-DP) as introduced by Dong et al. (2022)
+    <doi:10.1111/rssb.12454>. Includes Gaussian differential privacy, the f-DP
+    generalisation of (epsilon,delta)-differential privacy and allows user
+    specification of optimal type I and type II errors from which the lower
+    convex hull trade-off function is automatically constructed.
+License: GPL (>= 3)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports: 
+    cli,
+    ggplot2,
+    rlang
