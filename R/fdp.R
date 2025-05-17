@@ -20,41 +20,36 @@
 #' @examples
 #' #fdp(epsdelta(1,0.1), gdp(1), "a"=gdp(0.5), tst=data.frame(alpha=c(1,0.5,0),beta=c(0,0.3,1)), asd=data.frame(alpha=c(1,0.4,0),beta=c(0,0.51,1)))
 fdp <- function(...) {
-  xx <- list(...)
-  if (length(xx) == 0L)
+  x <- list(...)
+  if (length(x) == 0L)
     return(invisible(NULL))
 
   p <- ggplot2::ggplot() +
-    ggplot2::geom_function(fun = \(x) 1.0 - x, linetype = 2L, colour = "grey") +
+    ggplot2::geom_function(fun = \(xx) 1.0 - xx, linetype = 2L, colour = "grey") +
     ggplot2::coord_fixed(ratio = 1.0) +
     ggplot2::theme_minimal()
 
   lns <- pts <- data.frame()
-  for (i in seq_along(xx)) {
-    # Setup name and drawing type
-    nm <- ifelse(!is.null(names(xx)) && nzchar(names(xx)[i]), names(xx)[i], attr(xx[[i]], "fdp_name"))
-    if (is.null(nm)) {
-      cli::cli_abort(c(x = "Argument {i} is unnamed and does not have an {.code fdp_name} attribute"))
-    }
-    attr(xx[[i]], "fdp_draw") <- attr(xx[[i]], "fdp_draw") %||% ifelse(nrow(xx[[i]]) < 100L, "point", "line")
-    if (attr(xx[[i]], "fdp_draw") == "point") {
+  x <- preprocess_args(x)
+  for (i in seq_along(x)) {
+    if (attr(x[[i]], "fdp_draw") == "point") {
       # Points
-      if (!(attr(xx[[i]], "fdp_hide_point") %||% FALSE)) {
+      if (!(attr(x[[i]], "fdp_hide_point") %||% FALSE)) {
         pts <- rbind(pts,
-                     cbind(item = nm,
-                           xx[[i]]))
+                     cbind(item = attr(x[[i]], "fdp_name"),
+                           x[[i]]))
       }
       # Lower convex hull
       lns <- rbind(lns,
-                   cbind(item = nm,
-                         lower_hull(xx[[i]])))
-    } else if (attr(xx[[i]], "fdp_draw") == "line") {
-      if (!isTRUE(all.equal(xx[[i]], lower_hull(xx[[i]])))) {
+                   cbind(item = attr(x[[i]], "fdp_name"),
+                         lower_hull(x[[i]])))
+    } else if (attr(x[[i]], "fdp_draw") == "line") {
+      if (!isTRUE(all.equal(x[[i]], lower_hull(x[[i]])))) {
         cli::cli_abort(c(x = "Argument {i} is to be drawn as a line, but is not convex (ie not a trade-off function). Either there is an error or this should be passed with {.fn fdp_point}."))
       }
       lns <- rbind(lns,
-                   cbind(item = nm,
-                         xx[[i]]))
+                   cbind(item = attr(x[[i]], "fdp_name"),
+                         x[[i]]))
     } else {
       cli::cli_abort(c(x = "Argument {i} has unknown {.code fdp_draw} attribute set."))
     }
