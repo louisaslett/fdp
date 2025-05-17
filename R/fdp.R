@@ -27,7 +27,9 @@ fdp <- function(...) {
   p <- ggplot2::ggplot() +
     ggplot2::geom_function(fun = \(xx) 1.0 - xx, linetype = 2L, colour = "grey") +
     ggplot2::coord_fixed(ratio = 1.0) +
-    ggplot2::theme_minimal()
+    ggplot2::theme_minimal() +
+    ggplot2::scale_color_discrete(name = NULL) +
+    ggplot2::labs(x = "Type-I error", y = "Type-II error")
 
   lns <- pts <- data.frame()
   x <- preprocess_args(x)
