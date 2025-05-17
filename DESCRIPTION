@@ -19,3 +19,5 @@ Imports:
     cli,
     ggplot2,
     rlang
+URL: https://github.com/louisaslett/fdp
+BugReports: https://github.com/louisaslett/fdp/issues
