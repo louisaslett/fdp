@@ -7,6 +7,14 @@
 \description{
 Visualisation and construction of trade-off functions for f-differential privacy (f-DP) as introduced by Dong et al. (2022) \doi{10.1111/rssb.12454}. Includes Gaussian differential privacy, the f-DP generalisation of (epsilon,delta)-differential privacy and allows user specification of optimal type I and type II errors from which the lower convex hull trade-off function is automatically constructed.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/louisaslett/fdp}
+  \item Report bugs at \url{https://github.com/louisaslett/fdp/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Louis Aslett \email{louis.aslett@durham.ac.uk} (\href{https://orcid.org/0000-0003-2211-233X}{ORCID})
 
