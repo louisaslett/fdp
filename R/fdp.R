@@ -25,44 +25,46 @@ fdp <- function(...) {
     return(invisible(NULL))
 
   p <- ggplot2::ggplot() +
-    ggplot2::geom_function(fun = \(xx) 1.0 - xx, linetype = 2L, colour = "grey") +
+    ggplot2::lims(x = c(0,1), y = c(0,1)) +
     ggplot2::coord_fixed(ratio = 1.0) +
+    ggplot2::geom_function(fun = \(xx) 1.0 - xx, linetype = 2L, colour = "grey") +
     ggplot2::theme_minimal() +
-    ggplot2::scale_color_discrete(name = NULL) +
     ggplot2::labs(x = "Type-I error", y = "Type-II error")
 
-  lns <- pts <- data.frame()
+  lns <- pts <- list()
+  nms <- c()
   x <- preprocess_args(x)
   for (i in seq_along(x)) {
+    nms <- c(nms, attr(x[[i]], "fdp_name"))
     if (attr(x[[i]], "fdp_draw") == "point") {
       # Points
       if (!(attr(x[[i]], "fdp_hide_point") %||% FALSE)) {
-        pts <- rbind(pts,
-                     cbind(item = attr(x[[i]], "fdp_name"),
-                           x[[i]]))
+        pts <- c(pts,
+                 list(cbind(item = attr(x[[i]], "fdp_name"),
+                            x[[i]])))
       }
       # Lower convex hull
-      lns <- rbind(lns,
-                   cbind(item = attr(x[[i]], "fdp_name"),
-                         lower_hull(x[[i]])))
+      lns <- c(lns,
+               list(cbind(item = attr(x[[i]], "fdp_name"),
+                          lower_hull(x[[i]]))))
     } else if (attr(x[[i]], "fdp_draw") == "line") {
       if (!isTRUE(all.equal(x[[i]], lower_hull(x[[i]])))) {
         cli::cli_abort(c(x = "Argument {i} is to be drawn as a line, but is not convex (ie not a trade-off function). Either there is an error or this should be passed with {.fn fdp_point}."))
       }
-      lns <- rbind(lns,
-                   cbind(item = attr(x[[i]], "fdp_name"),
-                         x[[i]]))
+      lns <- c(lns,
+               list(cbind(item = attr(x[[i]], "fdp_name"),
+                          x[[i]])))
     } else {
       cli::cli_abort(c(x = "Argument {i} has unknown {.code fdp_draw} attribute set."))
     }
   }
-  if (nrow(lns) > 0L) {
+  for (i in seq_along(lns)) {
     p <- p +
-      ggplot2::geom_line(ggplot2::aes(x = .data$alpha, y = .data$beta, col = .data$item), lns)
+      ggplot2::geom_line(ggplot2::aes(x = .data$alpha, y = .data$beta, col = .data$item), lns[[i]])
   }
-  if (nrow(pts) > 0L) {
+  for (i in seq_along(pts)) {
     p <- p +
-      ggplot2::geom_point(ggplot2::aes(x = .data$alpha, y = .data$beta, col = .data$item), pts, size = 0.5, shape = 4L, stroke = 1.5)
+      ggplot2::geom_point(ggplot2::aes(x = .data$alpha, y = .data$beta, col = .data$item), pts[[i]], size = 0.5, shape = 4L, stroke = 1.5)
   }
-  p
+  p + ggplot2::scale_color_discrete(name = NULL, breaks = nms)
 }
