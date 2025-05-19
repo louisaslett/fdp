@@ -11,6 +11,8 @@
 #'
 #' @param ...
 #'        f-differential privacy inputs to plot.
+#' @param .legend
+#'        A title for the colour legend, by default there is no title.
 #'
 #' @return
 #' A ggplot2 object which will plot
@@ -19,7 +21,7 @@
 #'
 #' @examples
 #' #fdp(epsdelta(1,0.1), gdp(1), "a"=gdp(0.5), tst=data.frame(alpha=c(1,0.5,0),beta=c(0,0.3,1)), asd=data.frame(alpha=c(1,0.4,0),beta=c(0,0.51,1)))
-fdp <- function(...) {
+fdp <- function(..., .legend = NULL) {
   x <- list(...)
   if (length(x) == 0L)
     return(invisible(NULL))
@@ -66,5 +68,5 @@ fdp <- function(...) {
     p <- p +
       ggplot2::geom_point(ggplot2::aes(x = .data$alpha, y = .data$beta, col = .data$item), pts[[i]], size = 0.5, shape = 4L, stroke = 1.5)
   }
-  p + ggplot2::scale_color_discrete(name = NULL, breaks = nms)
+  p + ggplot2::scale_colour_discrete(name = .legend, breaks = nms)
 }
