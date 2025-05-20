@@ -4,10 +4,12 @@
 \alias{fdp}
 \title{Plot f-differential privacy}
 \usage{
-fdp(...)
+fdp(..., .legend = NULL)
 }
 \arguments{
 \item{...}{f-differential privacy inputs to plot.}
+
+\item{.legend}{A title for the colour legend, by default there is no title.}
 }
 \value{
 A ggplot2 object which will plot

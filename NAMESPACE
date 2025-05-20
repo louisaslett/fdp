@@ -2,7 +2,9 @@
 
 export(epsdelta)
 export(fdp)
+export(fdp_attributes)
 export(fdp_line)
+export(fdp_name)
 export(fdp_point)
 export(gdp)
 importFrom(rlang,.data)

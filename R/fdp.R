@@ -22,42 +22,46 @@
 #' @examples
 #' #fdp(epsdelta(1,0.1), gdp(1), "a"=gdp(0.5), tst=data.frame(alpha=c(1,0.5,0),beta=c(0,0.3,1)), asd=data.frame(alpha=c(1,0.4,0),beta=c(0,0.51,1)))
 fdp <- function(..., .legend = NULL) {
-  x <- list(...)
+  # Grid of alpha we evaluate on for function arguments
+  alpha <- seq(0.0, 1.0, length.out = 100L)
+
+  # Preprocess args so convert everything into values
+  dotargs <- as.list(substitute(list(...)))[-1L]
+  x <- preprocess_args(dotargs, alpha)
   if (length(x) == 0L)
     return(invisible(NULL))
 
   p <- ggplot2::ggplot() +
-    ggplot2::lims(x = c(0,1), y = c(0,1)) +
+    ggplot2::lims(x = c(0.0, 1.0), y = c(0.0, 1.0)) +
     ggplot2::coord_fixed(ratio = 1.0) +
     ggplot2::geom_function(fun = \(xx) 1.0 - xx, linetype = 2L, colour = "grey") +
     ggplot2::theme_minimal() +
     ggplot2::labs(x = "Type-I error", y = "Type-II error")
 
   lns <- pts <- list()
-  nms <- c()
-  x <- preprocess_args(x)
+  nms <- NULL
   for (i in seq_along(x)) {
-    nms <- c(nms, attr(x[[i]], "fdp_name"))
+    nms <- c(nms, fdp_name(x[[i]]))
     if (attr(x[[i]], "fdp_draw") == "point") {
       # Points
       if (!(attr(x[[i]], "fdp_hide_point") %||% FALSE)) {
         pts <- c(pts,
-                 list(cbind(item = attr(x[[i]], "fdp_name"),
+                 list(cbind(item = fdp_name(x[[i]]),
                             x[[i]])))
       }
       # Lower convex hull
       lns <- c(lns,
-               list(cbind(item = attr(x[[i]], "fdp_name"),
+               list(cbind(item = fdp_name(x[[i]]),
                           lower_hull(x[[i]]))))
     } else if (attr(x[[i]], "fdp_draw") == "line") {
       if (!isTRUE(all.equal(x[[i]], lower_hull(x[[i]])))) {
-        cli::cli_abort(c(x = "Argument {i} is to be drawn as a line, but is not convex (ie not a trade-off function). Either there is an error or this should be passed with {.fn fdp_point}."))
+        cli::cli_abort(c(x = "Argument {i} (named {attr(x[[i]], 'fdp_name')}) is to be drawn as a line, but is not convex (ie not a trade-off function). Either there is an error or this should be passed with {.fn fdp_point}."))
       }
       lns <- c(lns,
-               list(cbind(item = attr(x[[i]], "fdp_name"),
+               list(cbind(item = fdp_name(x[[i]]),
                           x[[i]])))
     } else {
-      cli::cli_abort(c(x = "Argument {i} has unknown {.code fdp_draw} attribute set."))
+      cli::cli_abort(c(x = "Argument {i} (named {attr(x[[i]], 'fdp_name')}) has unknown {.code fdp_draw} attribute set."))
     }
   }
   for (i in seq_along(lns)) {
