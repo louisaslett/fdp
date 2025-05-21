@@ -4,7 +4,7 @@
 \alias{epsdelta}
 \title{(epsilon, delta)-differential privacy trade off function}
 \usage{
-epsdelta(epsilon, delta = 0L)
+epsdelta(epsilon, delta = 0)
 }
 \arguments{
 \item{epsilon}{The \eqn{\varepsilon} privacy parameter.}

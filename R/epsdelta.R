@@ -19,11 +19,34 @@
 #'
 #' @examples
 #' #gdp(0.5)
-epsdelta <- function(epsilon, delta = 0L) {
+epsdelta <- function(epsilon, delta = 0.0) {
+  check_scalar(epsilon, min = 0.0)
+  check_scalar(delta, min = 0.0, max = 1.0)
+
+  # Compute trade-off function skeleton
   mid <- (1.0 - delta) / (exp(epsilon) + 1.0)
-  x <- data.frame(alpha = c(0.0, mid, 1.0 - delta),
-                  beta = c(1.0 - delta, 1.0 - delta - mid * exp(epsilon), 0.0))
-  attr(x, "fdp_name") <- paste0("(", epsilon, ",", delta, ")-DP")
-  attr(x, "fdp_draw") <- "line"
-  x
+  tradeoff <- data.frame(alpha = c(0.0, mid, 1.0 - delta),
+                         beta  = c(1.0 - delta, 1.0 - delta - mid * exp(epsilon), 0.0))
+  tradeoff <- fdp_line(fdp_name(tradeoff, paste0("(", epsilon, ",", delta, ")-DP")))
+
+  # create interpolated trade-off function (linear interpolation)
+  f <- function(alpha) {
+    if (missing(alpha) | as.character(sys.call(sys.parent(3)))[[1]] == "preprocess_args") {
+      tradeoff
+    } else {
+      res <- data.frame(alpha = alpha, beta = approx(x = tradeoff[["alpha"]], y = tradeoff[["beta"]], xout = alpha)$y)
+      res <- fdp_name(res, paste0("(", epsilon, ",", delta, ")-DP"))
+      res
+    }
+  }
+  # Assign attributes, class, and return function
+  f <- fdp_line(fdp_name(f, paste0("(", epsilon, ",", delta, ")-DP")))
+  class(f) <- c("fdp_epsdelta_tradeoff", class(f))
+  f
+}
+
+#' @exportS3Method print fdp_epsdelta_tradeoff
+print.fdp_epsdelta_tradeoff <- function(x, ...) {
+  cat(paste0("(\u03B5, \u03B4)-Differential Privacy Trade-off Function\n  Parameters:\n    \u03B5 = ", get("epsilon", envir = environment(x)), "\n    \u03B4 = ", get("delta", envir = environment(x)), "\n"))
+  invisible()
 }

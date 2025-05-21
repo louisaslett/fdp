@@ -18,6 +18,8 @@
 #' @examples
 #' #gdp(0.5)
 gdp <- function(mu = 1.0) {
+  check_scalar(mu, min = 0.0)
+
   f <- function(alpha) {
     if (missing(alpha)) {
       x <- data.frame(alpha = seq(0.0, 1.0, by = 0.01))
@@ -36,6 +38,6 @@ gdp <- function(mu = 1.0) {
 
 #' @exportS3Method print fdp_gdp_tradeoff
 print.fdp_gdp_tradeoff <- function(x, ...) {
-  cat(paste0("Gaussian Differential Privacy Trade-off Function\n  Parameters:\n    mu = ", get("mu", envir = environment(x)), "\n"))
+  cat(paste0("Gaussian Differential Privacy Trade-off Function\n  Parameters:\n    \u03BC = ", get("mu", envir = environment(x)), "\n"))
   invisible()
 }

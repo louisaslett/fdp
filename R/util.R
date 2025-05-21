@@ -180,3 +180,21 @@ check_alpha <- function(alpha) {
   }
   invisible(TRUE)
 }
+
+check_scalar <- function(x, min = NULL, max = NULL) {
+  name <- deparse(substitute(x))
+  
+  if (length(x) != 1) {
+    cli::cli_abort("Argument {.code {name}} must be a scalar value.", call = parent.frame(1L))
+  }
+  if (is.null(x) || is.na(x)) {
+    cli::cli_abort("Argument {.code {name}} must not be NULL or NA.", call = parent.frame(1L))
+  }
+  if (!is.null(min) && x <= min) {
+    cli::cli_abort("Argument {.code {name}} must be greater than {.val {min}}.", call = parent.frame(1L))
+  }
+  if (!is.null(max) && x >= max) {
+    cli::cli_abort("Argument {.code {name}} must be smaller than {.val {max}}.", call = parent.frame(1L))
+  }
+  invisible(TRUE)
+}
