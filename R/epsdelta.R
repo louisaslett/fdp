@@ -25,8 +25,8 @@ epsdelta <- function(epsilon, delta = 0.0) {
 
   # Compute trade-off function skeleton
   mid <- (1.0 - delta) / (exp(epsilon) + 1.0)
-  tradeoff <- data.frame(alpha = c(0.0, mid, 1.0 - delta),
-                         beta  = c(1.0 - delta, 1.0 - delta - mid * exp(epsilon), 0.0))
+  tradeoff <- unique(data.frame(alpha = c(0.0, mid, 1.0 - delta, 1.0),
+                                beta  = c(1.0 - delta, 1.0 - delta - mid * exp(epsilon), 0.0, 0.0)))
   tradeoff <- fdp_line(fdp_name(tradeoff, paste0("(", epsilon, ",", delta, ")-DP")))
 
   # create interpolated trade-off function (linear interpolation)
