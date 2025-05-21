@@ -4,7 +4,7 @@
 \alias{est_gdp}
 \title{Estimate Gaussian differential privacy of trade off points}
 \usage{
-est_gdp(x, dp = 2)
+est_gdp(x, dp = 2L)
 }
 \arguments{
 \item{mu}{The GDP privacy parameter.}

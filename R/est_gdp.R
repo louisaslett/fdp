@@ -17,16 +17,19 @@
 #'
 #' @examples
 #' #gdp(0.5)
-est_gdp <- function(x, dp = 2) {
+est_gdp <- function(x, dp = 2L) {
+  check_scalar(dp, min = 0L)
+  if (!is.integer(dp)) cli::cli_abort(c(x = "{.code dp} argument should be a non-negative integer, indicating the decimal places of accuracy to computing bounding DP to."))
+
   alpha <- seq(0.0, 1.0, by = 0.01)
 
-  target <- preprocess_args(list(`est_gdp` = substitute(x)), alpha)[[1]]
+  target <- preprocess_args(list(est_gdp = substitute(x)), alpha)[[1L]]
   g <- function(mu, target) { # if -'ve, no bound; if +'ve, bounds.
     x <- target[["beta"]] - gdp(mu)(target[["alpha"]])[["beta"]]
     if (any(x < 0.0)) {
-      return(sum(x[x<0.0]))
+      return(sum(x[x < 0.0]))
     }
-    return(sum(x[x>0.0]))
+    sum(x[x > 0.0])
   }
   if (min(g(10.0, target)) < 0.0) {
     cli::cli_abort("Unable to find a \u03BC < 10 which lower bounds provided trade-off points. May not be bounded by Gaussian differential privacy trade-off function.")
@@ -37,7 +40,7 @@ est_gdp <- function(x, dp = 2) {
   mu <- uniroot(g,
                 target = target,
                 lower = 10.0^(-dp), upper = 10.0)$root
-  mu <- ceiling(mu * 10.0^dp) * 10^(-dp)
+  mu <- ceiling(mu * 10.0^dp) * 10.0^(-dp)
   while (min(g(mu, target)) < 0.0) {
     mu <- mu + 10.0^(-dp)
   }
