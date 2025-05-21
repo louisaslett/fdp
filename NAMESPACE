@@ -3,6 +3,7 @@
 S3method(print,fdp_epsdelta_tradeoff)
 S3method(print,fdp_gdp_tradeoff)
 export(epsdelta)
+export(est_epsdelta)
 export(est_gdp)
 export(fdp)
 export(fdp_attributes)
