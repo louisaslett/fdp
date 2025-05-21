@@ -54,7 +54,7 @@ fdp <- function(..., .legend = NULL) {
                list(cbind(item = fdp_name(x[[i]]),
                           lower_hull(x[[i]]))))
     } else if (attr(x[[i]], "fdp_draw") == "line") {
-      if (!isTRUE(all.equal(x[[i]], lower_hull(x[[i]])))) {
+      if (!isTRUE(all.equal(approx(lower_hull(x[[i]]), xout = x[[i]][, 1L])$y, x[[i]][, 2L]))) {
         cli::cli_abort(c(x = "Argument {i} (named {attr(x[[i]], 'fdp_name')}) is to be drawn as a line, but is not convex (ie not a trade-off function). Either there is an error or this should be passed with {.fn fdp_point}."))
       }
       lns <- c(lns,
