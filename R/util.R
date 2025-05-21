@@ -38,10 +38,20 @@ preprocess_args <- function(args, alpha) {
 
     # Establish what to do with this argument
     if (is.symbol(arg)) {
-      env$fdp_function_to_call <- eval(arg, parent.frame(2L))
+      env$fdp_function_to_call <- tryCatch(eval(arg, parent.frame(2L)),
+                                           error = function(e) {
+                                             cli::cli_abort(c(x = "Error when trying to evaluate argument {.code {as.character(as.expression(arg))}}",
+                                                              ">" = e[["message"]]),
+                                                            call = parent.frame(5L))
+                                           })
       if (is.function(env$fdp_function_to_call)) {
         # CASE 1: Found bare function symbol, so evaluate it on alpha eg fdp(my_dp)
-        res <- eval(expression(fdp_function_to_call(alpha)), envir = env)
+        res <- tryCatch(eval(expression(fdp_function_to_call(alpha)), envir = env),
+                        error = function(e) {
+                          cli::cli_abort(c(x = "Error when trying to evaluate argument {.code {as.character(as.expression(arg))}}",
+                                           ">" = e[["message"]]),
+                                         call = parent.frame(5L))
+                        })
         res <- copy_atts(res, env$fdp_function_to_call) # Need to see if attributes were set on the function, rather than output of function and copy over (without overwriting)
         res2 <- fixup_type(res, alpha)
         res2 <- copy_atts(res2, res)
@@ -53,7 +63,12 @@ preprocess_args <- function(args, alpha) {
       } else {
         # CASE 2: Found bare symbol that is not a function (ie user passed a variable with df) so just return it eg fdp(X)
         rm("alpha", "fdp_function_to_call", envir = env)
-        res <- eval(arg, envir = env)
+        res <- tryCatch(eval(arg, envir = env),
+                        error = function(e) {
+                          cli::cli_abort(c(x = "Error when trying to evaluate argument {.code {as.character(as.expression(arg))}}",
+                                           ">" = e[["message"]]),
+                                         call = parent.frame(5L))
+                        })
         res2 <- fixup_type(res) # alpha not involved in this evaluation
         res2 <- copy_atts(res2, res)
         res2 <- fixup_name_draw(res2, nm)
@@ -66,11 +81,26 @@ preprocess_args <- function(args, alpha) {
       # CASE 3: We have either an unevaluated function call eg fdp(my_dp(alpha, 2))
       #         or an inline defined data frame eg fdp(data.frame(alpha=....,beta=....))
       #         or indirectly a function if it has been modified en-route eg fdp(fdp_point(\(x) 1-x))
-      res <- eval(arg, envir = env)
+      res <- tryCatch(eval(arg, envir = env),
+                      error = function(e) {
+                        cli::cli_abort(c(x = "Error when trying to evaluate argument {.code {as.character(as.expression(arg))}}",
+                                         ">" = e[["message"]]),
+                                       call = parent.frame(5L))
+                      })
       if (is.function(res)) {
         # Ah! it's an indirect function -- reevaluate in the right environment
-        env$fdp_function_to_call <- eval(arg, parent.frame(2L))
-        res <- eval(expression(fdp_function_to_call(alpha)), envir = env)
+        env$fdp_function_to_call <- tryCatch(eval(arg, parent.frame(2L)),
+                                             error = function(e) {
+                                               cli::cli_abort(c(x = "Error when trying to evaluate argument {.code {as.character(as.expression(arg))}}",
+                                                                ">" = e[["message"]]),
+                                                              call = parent.frame(5L))
+                                             })
+        res <- tryCatch(eval(expression(fdp_function_to_call(alpha)), envir = env),
+                        error = function(e) {
+                          cli::cli_abort(c(x = "Error when trying to evaluate argument {.code {as.character(as.expression(arg))}}",
+                                           ">" = e[["message"]]),
+                                         call = parent.frame(5L))
+                        })
         res <- copy_atts(res, env$fdp_function_to_call) # Need to see if attributes were set on the function, rather than output of function and copy over (without overwriting)
       }
       res2 <- fixup_type(res, alpha)
@@ -170,11 +200,11 @@ check_alpha <- function(alpha) {
     cli::cli_abort(c(x = "{.code alpha} must contain numeric values."),
                    call = parent.frame(1L))
   }
-  if (any(is.na(alpha))) {
+  if (anyNA(alpha)) {
     cli::cli_abort(c(x = "{.code alpha} must contain numeric values."),
                    call = parent.frame(1L))
   }
-  if (any(alpha < 0 | alpha > 1)) {
+  if (any(alpha < 0.0 | alpha > 1.0)) {
     cli::cli_abort(c(x = "All values in {.code alpha} must be in the interval [0, 1]."),
                    call = parent.frame(1L))
   }
@@ -183,18 +213,18 @@ check_alpha <- function(alpha) {
 
 check_scalar <- function(x, min = NULL, max = NULL) {
   name <- deparse(substitute(x))
-  
-  if (length(x) != 1) {
+
+  if (length(x) != 1L) {
     cli::cli_abort("Argument {.code {name}} must be a scalar value.", call = parent.frame(1L))
   }
   if (is.null(x) || is.na(x)) {
     cli::cli_abort("Argument {.code {name}} must not be NULL or NA.", call = parent.frame(1L))
   }
-  if (!is.null(min) && x <= min) {
-    cli::cli_abort("Argument {.code {name}} must be greater than {.val {min}}.", call = parent.frame(1L))
+  if (!is.null(min) && x < min) {
+    cli::cli_abort("Argument {.code {name}} must be at least {.val {min}}.", call = parent.frame(1L))
   }
-  if (!is.null(max) && x >= max) {
-    cli::cli_abort("Argument {.code {name}} must be smaller than {.val {max}}.", call = parent.frame(1L))
+  if (!is.null(max) && x > max) {
+    cli::cli_abort("Argument {.code {name}} must be at most {.val {max}}.", call = parent.frame(1L))
   }
-  invisible(TRUE)
+  invisible(name)
 }

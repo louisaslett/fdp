@@ -31,7 +31,7 @@ epsdelta <- function(epsilon, delta = 0.0) {
 
   # create interpolated trade-off function (linear interpolation)
   f <- function(alpha) {
-    if (missing(alpha) | as.character(sys.call(sys.parent(3)))[[1]] == "preprocess_args") {
+    if (missing(alpha) || as.character(sys.call(sys.parent(3L)))[[1L]] == "preprocess_args") {
       tradeoff
     } else {
       res <- data.frame(alpha = alpha, beta = approx(x = tradeoff[["alpha"]], y = tradeoff[["beta"]], xout = alpha)$y)
