@@ -23,7 +23,7 @@
 #' #fdp(epsdelta(1,0.1), gdp(1), "a"=gdp(0.5), tst=data.frame(alpha=c(1,0.5,0),beta=c(0,0.3,1)), asd=data.frame(alpha=c(1,0.4,0),beta=c(0,0.51,1)))
 fdp <- function(..., .legend = NULL) {
   # Grid of alpha we evaluate on for function arguments
-  alpha <- seq(0.0, 1.0, length.out = 100L)
+  alpha <- seq(0.0, 1.0, by = 0.01)
 
   # Preprocess args so convert everything into values
   dotargs <- as.list(substitute(list(...)))[-1L]

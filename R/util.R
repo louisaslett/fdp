@@ -1,3 +1,23 @@
+# Utility for debugging environments(!)
+print_env_recursive <- function(e, level = 0L) {
+  # Stop if e is the global environment
+  if (identical(e, globalenv())) return()
+
+  indent <- strrep("  ", level)
+  cat(indent, "Environment:", environmentName(e), "\n")
+  objs <- ls(envir = e, all.names = TRUE)
+  if (length(objs) > 0L) {
+    for (obj in objs) {
+      cat(indent, "  ", obj, "\n")
+    }
+  } else {
+    cat(indent, "  <no objects>\n")
+  }
+  parent_e <- parent.env(e)
+  if (!identical(parent_e, globalenv()))
+    print_env_recursive(parent_e, level + 1L)
+}
+
 # This is to allow us to call fdp() with unevaluated arguments.
 # So,
 #   * fdp(my_dp)
@@ -75,7 +95,7 @@ fixup_type <- function(x, alpha = NULL) {
     if (all(c("alpha", "beta") %in% names(x))) {
       return(x)
     } else {
-      cli::cli_abort("Argument {.code {as.character(as.expression(arg))}} provides a data frame but, missing required {.code alpha} and {.code beta} columns.",
+      cli::cli_abort("Argument {.code {as.character(as.expression(arg))}} provides a data frame, but missing required {.code alpha} and {.code beta} columns.",
                      call = parent.frame(2L), # ie fdp()
                      .envir = parent.frame(1L)) # ie preprocess_arg()
       return() # to satisfy linter
@@ -141,22 +161,22 @@ eliminate_axis_hugging <- function(x) {
   x
 }
 
-# Utility for debugging environments(!)
-print_env_recursive <- function(e, level = 0L) {
-  # Stop if e is the global environment
-  if (identical(e, globalenv())) return()
-
-  indent <- strrep("  ", level)
-  cat(indent, "Environment:", environmentName(e), "\n")
-  objs <- ls(envir = e, all.names = TRUE)
-  if (length(objs) > 0L) {
-    for (obj in objs) {
-      cat(indent, "  ", obj, "\n")
-    }
-  } else {
-    cat(indent, "  <no objects>\n")
+check_alpha <- function(alpha) {
+  if (!is.atomic(alpha) || is.list(alpha)) {
+    cli::cli_abort(c(x = "{.code alpha} must be an atomic vector (not a list)."),
+                   call = parent.frame(1L))
   }
-  parent_e <- parent.env(e)
-  if (!identical(parent_e, globalenv()))
-    print_env_recursive(parent_e, level + 1L)
+  if (!is.numeric(alpha)) {
+    cli::cli_abort(c(x = "{.code alpha} must contain numeric values."),
+                   call = parent.frame(1L))
+  }
+  if (any(is.na(alpha))) {
+    cli::cli_abort(c(x = "{.code alpha} must contain numeric values."),
+                   call = parent.frame(1L))
+  }
+  if (any(alpha < 0 | alpha > 1)) {
+    cli::cli_abort(c(x = "All values in {.code alpha} must be in the interval [0, 1]."),
+                   call = parent.frame(1L))
+  }
+  invisible(TRUE)
 }

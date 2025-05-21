@@ -11,15 +11,31 @@
 #'        The GDP privacy parameter.
 #'
 #' @return
-#' A GDP object
+#' A GDP function
 #'
 #' @export
 #'
 #' @examples
 #' #gdp(0.5)
 gdp <- function(mu = 1.0) {
-  x <- data.frame(alpha = seq(0.0, 1.0, length.out = 100L))
-  x$beta <- stats::pnorm(stats::qnorm(1.0 - x$alpha) - mu)
-  attr(x, "fdp_name") <- paste0(mu, "-GDP")
-  x
+  f <- function(alpha) {
+    if (missing(alpha)) {
+      x <- data.frame(alpha = seq(0.0, 1.0, by = 0.01))
+    } else {
+      check_alpha(alpha)
+      x <- data.frame(alpha = alpha)
+    }
+    x$beta <- stats::pnorm(stats::qnorm(1.0 - x$alpha) - mu)
+    x <- fdp_name(x, paste0(mu, "-GDP"))
+    x
+  }
+  f <- fdp_name(f, paste0(mu, "-GDP"))
+  class(f) <- c("fdp_gdp_tradeoff", class(f))
+  f
+}
+
+#' @exportS3Method print fdp_gdp_tradeoff
+print.fdp_gdp_tradeoff <- function(x, ...) {
+  cat(paste0("Gaussian Differential Privacy Trade-off Function\n  Parameters:\n    mu = ", get("mu", envir = environment(x)), "\n"))
+  invisible()
 }

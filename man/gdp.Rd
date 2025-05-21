@@ -10,7 +10,7 @@ gdp(mu = 1)
 \item{mu}{The GDP privacy parameter.}
 }
 \value{
-A GDP object
+A GDP function
 }
 \description{
 Creates a Gaussian differential privacy trade off function
