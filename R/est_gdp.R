@@ -37,9 +37,9 @@ est_gdp <- function(x, dp = 2L) {
   if (min(g(10.0^(-dp), target)) > 0.0) {
     return(gdp(10.0^(-dp)))
   }
-  mu <- uniroot(g,
-                target = target,
-                lower = 10.0^(-dp), upper = 10.0)$root
+  mu <- stats::uniroot(g,
+                       target = target,
+                       lower = 10.0^(-dp), upper = 10.0)$root
   mu <- ceiling(mu * 10.0^dp) * 10.0^(-dp)
   while (min(g(mu, target)) < 0.0) {
     mu <- mu + 10.0^(-dp)

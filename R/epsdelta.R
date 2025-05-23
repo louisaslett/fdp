@@ -34,7 +34,7 @@ epsdelta <- function(epsilon, delta = 0.0) {
     if (missing(alpha) || as.character(sys.call(sys.parent(3L)))[[1L]] == "preprocess_args") {
       tradeoff
     } else {
-      res <- data.frame(alpha = alpha, beta = approx(x = tradeoff[["alpha"]], y = tradeoff[["beta"]], xout = alpha)$y)
+      res <- data.frame(alpha = alpha, beta = stats::approx(x = tradeoff[["alpha"]], y = tradeoff[["beta"]], xout = alpha)$y)
       res <- fdp_name(res, paste0("(", epsilon, ",", delta, ")-DP"))
       res
     }

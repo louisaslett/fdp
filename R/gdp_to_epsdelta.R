@@ -28,7 +28,7 @@ gdp_to_epsdelta <- function(mu = 0.5, epsilon = 1, dp = NULL) {
     dp <- as.integer(dp)
     check_scalar(dp, min = 1L)
   }
-  delta <- pnorm(-epsilon/mu+mu/2) - exp(epsilon) * pnorm(-epsilon/mu-mu/2)
+  delta <- stats::pnorm(-epsilon/mu+mu/2) - exp(epsilon) * stats::pnorm(-epsilon/mu-mu/2)
   if (!is.null(dp)) {
     delta <- ceiling(delta * 10.0^dp) * 10.0^(-dp)
   }

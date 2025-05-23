@@ -51,10 +51,10 @@ est_epsdelta <- function(x, epsilon = NULL, delta = NULL, dp = 2L) {
     if (min(g(10.0^(-dp), delta, target)) > 0.0) {
       epsilon <- 10.0^(-dp)
     } else {
-      epsilon <- uniroot(g,
-                         delta = delta,
-                         target = target,
-                         lower = 10.0^(-dp), upper = 30.0)$root
+      epsilon <- stats::uniroot(g,
+                                delta = delta,
+                                target = target,
+                                lower = 10.0^(-dp), upper = 30.0)$root
       epsilon <- ceiling(epsilon * 10.0^dp) * 10.0^(-dp)
       while (min(g(epsilon, delta, target)) < 0.0) {
         epsilon <- epsilon + 10.0^(-dp)
@@ -68,10 +68,10 @@ est_epsdelta <- function(x, epsilon = NULL, delta = NULL, dp = 2L) {
     if (min(g(epsilon, 0.0, target)) > 0.0) {
       delta <- 0.0
     } else {
-      delta <- uniroot(g,
-                       epsilon = epsilon,
-                       target = target,
-                       lower = 0.0, upper = 1.0)$root
+      delta <- stats::uniroot(g,
+                              epsilon = epsilon,
+                              target = target,
+                              lower = 0.0, upper = 1.0)$root
       delta <- ceiling(delta * 10.0^dp) * 10.0^(-dp)
       while (min(g(epsilon, delta, target)) < 0.0) {
         delta <- delta + 10.0^(-dp)
