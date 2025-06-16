@@ -9,6 +9,8 @@
 #' and an optional `"fdp_hide_point"` attribute, allowing control over whether the
 #' point should be hidden.
 #'
+#' Note in docs `fdp_name` is useful in case of pasting stuff, eg fdp_name(..., paste0(...))
+#'
 #' @param x
 #'        An object to which drawing attributes are added.
 #' @param hide

@@ -21,20 +21,20 @@
 #'
 #' @examples
 #' #fdp(epsdelta(1,0.1), gdp(1), "a"=gdp(0.5), tst=data.frame(alpha=c(1,0.5,0),beta=c(0,0.3,1)), asd=data.frame(alpha=c(1,0.4,0),beta=c(0,0.51,1)))
-fdp <- function(..., .legend = NULL) {
+fdp <- function(..., .legend = NULL, .tol = sqrt(.Machine$double.eps)) {
   # Grid of alpha we evaluate on for function arguments
   alpha <- seq(0.0, 1.0, by = 0.01)
 
   # Preprocess args so convert everything into values
   dotargs <- as.list(substitute(list(...)))[-1L]
-  x <- preprocess_args(dotargs, alpha)
+  x <- preprocess_args(dotargs, alpha, .tol)
   if (length(x) == 0L)
     return(invisible(NULL))
 
   p <- ggplot2::ggplot() +
-    ggplot2::lims(x = c(0.0, 1.0), y = c(0.0, 1.0)) +
+    ggplot2::lims(x = c(-0.01, 1.01), y = c(-0.01, 1.01)) +
     ggplot2::coord_fixed(ratio = 1.0) +
-    ggplot2::geom_function(fun = \(xx) 1.0 - xx, linetype = 2L, colour = "grey") +
+    ggplot2::geom_function(fun = \(xx) 1.0 - xx, linetype = 2L, colour = "grey", xlim = c(0.0, 1.0)) +
     ggplot2::theme_minimal() +
     ggplot2::labs(x = "Type-I error", y = "Type-II error")
 
@@ -54,7 +54,7 @@ fdp <- function(..., .legend = NULL) {
                list(cbind(item = fdp_name(x[[i]]),
                           lower_hull(x[[i]]))))
     } else if (attr(x[[i]], "fdp_draw") == "line") {
-      if (!isTRUE(all.equal(approx(lower_hull(x[[i]]), xout = x[[i]][, 1L])$y, x[[i]][, 2L]))) {
+      if (!isTRUE(all.equal(stats::approx(lower_hull(x[[i]]), xout = x[[i]][, 1L])$y, x[[i]][, 2L], tolerance = .tol))) {
         cli::cli_abort(c(x = "Argument {i} (named {attr(x[[i]], 'fdp_name')}) is to be drawn as a line, but is not convex (ie not a trade-off function). Either there is an error or this should be passed with {.fn fdp_point}."))
       }
       lns <- c(lns,

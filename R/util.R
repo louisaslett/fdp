@@ -27,7 +27,7 @@ print_env_recursive <- function(e, level = 0L) {
 #   * fdp(X)
 #   * fdp(data.frame(...))
 # also fine, even if ... references stuff in the calling environment
-preprocess_args <- function(args, alpha) {
+preprocess_args <- function(args, alpha, tol = sqrt(.Machine$double.eps)) {
   x <- list()
   for (i in seq_along(args)) {
     arg <- args[[i]]
@@ -57,7 +57,7 @@ preprocess_args <- function(args, alpha) {
         res2 <- copy_atts(res2, res)
         res2 <- fixup_name_draw(res2, nm)
         res2 <- fixup_axis_hugging(res2)
-        check_typei_ii(res2)
+        check_typei_ii(res2, tol)
         x <- c(x, list(res2))
         next
       } else {
@@ -73,7 +73,7 @@ preprocess_args <- function(args, alpha) {
         res2 <- copy_atts(res2, res)
         res2 <- fixup_name_draw(res2, nm)
         res2 <- fixup_axis_hugging(res2)
-        check_typei_ii(res2)
+        check_typei_ii(res2, tol)
         x <- c(x, list(res2))
         next
       }
@@ -107,7 +107,7 @@ preprocess_args <- function(args, alpha) {
       res2 <- copy_atts(res2, res)
       res2 <- fixup_name_draw(res2, nm)
       res2 <- fixup_axis_hugging(res2)
-      check_typei_ii(res2)
+      check_typei_ii(res2, tol)
       x <- c(x, list(res2))
       next
     }
@@ -174,9 +174,11 @@ fixup_axis_hugging <- function(x) {
   x
 }
 
-check_typei_ii <- function(x) {
-  if (any(x$beta > 1.0 - x$alpha)) {
-    cli::cli_abort(c(x = "Argument {.code {as.character(as.expression(arg))}} does not define valid type-I and type-II trade offs."),
+check_typei_ii <- function(x, tol) {
+  if (any(x$beta > 1.0 - x$alpha + tol)) {
+    i <- which(x$beta > 1.0 - x$alpha + tol)[1]
+    cli::cli_abort(c(x = "Argument {.code {as.character(as.expression(arg))}} does not define valid type-I and type-II trade offs.",
+                     ">" = paste0("For example, \u03B1 = ", x$alpha[i], " => \u03B2(\u03B1) = ", x$beta[i])),
                    call = parent.frame(2L), # ie fdp()
                    .envir = parent.frame(1L)) # ie preprocess_arg()
   }

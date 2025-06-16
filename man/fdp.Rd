@@ -4,7 +4,7 @@
 \alias{fdp}
 \title{Plot f-differential privacy}
 \usage{
-fdp(..., .legend = NULL)
+fdp(..., .legend = NULL, .tol = sqrt(.Machine$double.eps))
 }
 \arguments{
 \item{...}{f-differential privacy inputs to plot.}

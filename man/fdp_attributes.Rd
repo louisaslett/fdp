@@ -35,6 +35,8 @@ to its input, indicating that it should be drawn as a line.
 The \code{fdp_point} function adds the attribute \code{fdp_draw} set to \code{"point"}
 and an optional \code{"fdp_hide_point"} attribute, allowing control over whether the
 point should be hidden.
+
+Note in docs \code{fdp_name} is useful in case of pasting stuff, eg fdp_name(..., paste0(...))
 }
 \examples{
 # fdp_line
