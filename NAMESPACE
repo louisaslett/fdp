@@ -2,6 +2,7 @@
 
 S3method(print,fdp_epsdelta_tradeoff)
 S3method(print,fdp_gdp_tradeoff)
+S3method(print,fdp_lap_tradeoff)
 export(epsdelta)
 export(est_epsdelta)
 export(est_gdp)
@@ -12,4 +13,5 @@ export(fdp_name)
 export(fdp_point)
 export(gdp)
 export(gdp_to_epsdelta)
+export(lap)
 importFrom(rlang,.data)
