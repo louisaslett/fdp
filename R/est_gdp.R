@@ -2,13 +2,17 @@
 #'
 #' Estimates the Gaussian differential privacy of a set of trade off points
 #'
-#' TODO description
+#' This function finds the smallest GDP parameter \eqn{\mu} that lower bounds a given set trade-off points.
+#' It uses numerical optimisation to identify the smallest \eqn{\mu} value such that the GDP trade-off function lower bounds all provided trade-off points.
+#' The precision of the lower bound is controlled by the `dp` parameter, which specifies the number of decimal places for rounding.
 #'
 #' @references
 #' Dong, J., Roth, A. and Su, W.J. (2022). “Gaussian Differential Privacy”. _Journal of the Royal Statistical Society Series B_, **84**(1), 3–37. \doi{10.1111/rssb.12454}.
 #'
-#' @param mu
+#' @param x
 #'        The GDP privacy parameter.
+#' @param dp
+#'        The number of decimal places to which lower bounding Gaussian differential privacy function should be computed.
 #'
 #' @return
 #' A GDP function

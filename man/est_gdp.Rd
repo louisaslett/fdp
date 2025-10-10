@@ -7,7 +7,9 @@
 est_gdp(x, dp = 2L)
 }
 \arguments{
-\item{mu}{The GDP privacy parameter.}
+\item{x}{The GDP privacy parameter.}
+
+\item{dp}{The number of decimal places to which lower bounding Gaussian differential privacy function should be computed.}
 }
 \value{
 A GDP function
@@ -16,7 +18,9 @@ A GDP function
 Estimates the Gaussian differential privacy of a set of trade off points
 }
 \details{
-TODO description
+This function finds the smallest GDP parameter \eqn{\mu} that lower bounds a given set trade-off points.
+It uses numerical optimisation to identify the smallest \eqn{\mu} value such that the GDP trade-off function lower bounds all provided trade-off points.
+The precision of the lower bound is controlled by the \code{dp} parameter, which specifies the number of decimal places for rounding.
 }
 \examples{
 #gdp(0.5)

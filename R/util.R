@@ -176,7 +176,7 @@ fixup_axis_hugging <- function(x) {
 
 check_typei_ii <- function(x, tol) {
   if (any(x$beta > 1.0 - x$alpha + tol)) {
-    i <- which(x$beta > 1.0 - x$alpha + tol)[1]
+    i <- which(x$beta > 1.0 - x$alpha + tol)[1L]
     cli::cli_abort(c(x = "Argument {.code {as.character(as.expression(arg))}} does not define valid type-I and type-II trade offs.",
                      ">" = paste0("For example, \u03B1 = ", x$alpha[i], " => \u03B2(\u03B1) = ", x$beta[i])),
                    call = parent.frame(2L), # ie fdp()

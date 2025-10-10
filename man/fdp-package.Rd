@@ -5,7 +5,7 @@
 \alias{fdp-package}
 \title{fdp: f-Differential Privacy and Gaussian Differential Privacy}
 \description{
-Visualisation and construction of trade-off functions for f-differential privacy (f-DP) as introduced by Dong et al. (2022) \doi{10.1111/rssb.12454}. Includes Gaussian differential privacy, the f-DP generalisation of (epsilon,delta)-differential privacy and allows user specification of optimal type I and type II errors from which the lower convex hull trade-off function is automatically constructed.
+Constructs and visualises trade-off functions for f-differential privacy (f-DP) as introduced by Dong et al. (2022) \doi{10.1111/rssb.12454}. Supports Gaussian differential privacy, the f-DP generalisation of (epsilon, delta)-differential privacy, and accepts user-specified optimal type I / type II errors from which the lower convex hull trade-off function is automatically constructed.
 }
 \seealso{
 Useful links:

@@ -21,7 +21,7 @@
 #'
 #' @examples
 #' #gdp(0.5)
-gdp_to_epsdelta <- function(mu = 0.5, epsilon = 1, dp = NULL) {
+gdp_to_epsdelta <- function(mu = 0.5, epsilon = 1.0, dp = NULL) {
   check_scalar(mu, min = 0.0)
   check_scalar(epsilon, min = 0.0)
   if (!is.null(dp)) {
