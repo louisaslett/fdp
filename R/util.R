@@ -55,7 +55,7 @@ preprocess_args <- function(args, alpha, tol = sqrt(.Machine$double.eps)) {
         res <- copy_atts(res, env$fdp_function_to_call) # Need to see if attributes were set on the function, rather than output of function and copy over (without overwriting)
         res2 <- fixup_type(res, alpha)
         res2 <- copy_atts(res2, res)
-        res2 <- fixup_name_draw(res2, nm)
+        res2 <- fixup_name_draw(res2, nm, arg)
         res2 <- fixup_axis_hugging(res2)
         check_typei_ii(res2, tol)
         x <- c(x, list(res2))
@@ -71,7 +71,7 @@ preprocess_args <- function(args, alpha, tol = sqrt(.Machine$double.eps)) {
                         })
         res2 <- fixup_type(res) # alpha not involved in this evaluation
         res2 <- copy_atts(res2, res)
-        res2 <- fixup_name_draw(res2, nm)
+        res2 <- fixup_name_draw(res2, nm, arg)
         res2 <- fixup_axis_hugging(res2)
         check_typei_ii(res2, tol)
         x <- c(x, list(res2))
@@ -105,7 +105,7 @@ preprocess_args <- function(args, alpha, tol = sqrt(.Machine$double.eps)) {
       }
       res2 <- fixup_type(res, alpha)
       res2 <- copy_atts(res2, res)
-      res2 <- fixup_name_draw(res2, nm)
+      res2 <- fixup_name_draw(res2, nm, arg)
       res2 <- fixup_axis_hugging(res2)
       check_typei_ii(res2, tol)
       x <- c(x, list(res2))
@@ -146,13 +146,29 @@ fixup_type <- function(x, alpha = NULL) {
                  .envir = parent.frame(1L)) # ie preprocess_arg()
 }
 
-fixup_name_draw <- function(x, nm) {
+fixup_name_draw <- function(x, nm, arg = NULL) {
   if (!is.null(nm) && nzchar(nm)) {
     x <- fdp_name(x, nm)
   } else if (is.null(attr(x, "fdp_name"))) {
-    cli::cli_abort("Argument {.code {as.character(as.expression(arg))}} is unnamed and does not have a {.code fdp_name} attribute.",
-                   call = parent.frame(2L), # ie fdp()
-                   .envir = parent.frame(1L)) # ie preprocess_arg()
+    # Try to extract function name from the argument as a last resort
+    if (!is.null(arg)) {
+      if (is.symbol(arg)) {
+        # If arg is a bare symbol (e.g., my_fdp), use it as the name
+        x <- fdp_name(x, as.character(arg))
+      } else if (is.call(arg)) {
+        # If arg is a function call (e.g., my_fdp(alpha, 0.1)), extract the function name
+        func_name <- as.character(arg[[1L]])
+        x <- fdp_name(x, func_name)
+      } else {
+        cli::cli_abort("Argument {.code {as.character(as.expression(arg))}} is unnamed and does not have a {.code fdp_name} attribute.",
+                       call = parent.frame(2L), # ie fdp()
+                       .envir = parent.frame(1L)) # ie preprocess_arg()
+      }
+    } else {
+      cli::cli_abort("Argument {.code {as.character(as.expression(arg))}} is unnamed and does not have a {.code fdp_name} attribute.",
+                     call = parent.frame(2L), # ie fdp()
+                     .envir = parent.frame(1L)) # ie preprocess_arg()
+    }
   }
 
   current_draw <- attr(x, "fdp_draw")
