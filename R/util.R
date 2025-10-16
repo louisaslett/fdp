@@ -112,6 +112,38 @@ preprocess_args <- function(args, alpha, tol = sqrt(.Machine$double.eps)) {
       next
     }
   }
+
+  x <- deduplicate_names(x)
+
+  x
+}
+
+# Deduplicates trade-off function legend names by adding numeric suffixes to any duplicate names
+deduplicate_names <- function(x) {
+  if (length(x) == 0L) return(x)
+
+  # Preprocess_args constructs a list of data frames, one per trade-off function
+  # each with an fdp_name and fdp_type attribute, so extract names after this
+  # processing
+  names_list <- vapply(x, attr, character(1L), "fdp_name")
+
+  # Find duplicates
+  name_counts <- table(names_list)
+  duplicated_names <- names(name_counts[name_counts > 1L])
+
+  # Nothing to do? Return!
+  if (length(duplicated_names) == 0L) return(x)
+
+  # For just each duplicated name, add numeric suffixes
+  for (dup_name in duplicated_names) {
+    indices <- which(names_list == dup_name)
+    # First occurrence keeps original name, subsequent ones get " 2", " 3", etc. appended
+    for (i in seq_along(indices)[-1L]) {
+      idx <- indices[i]
+      attr(x[[idx]], "fdp_name") <- paste(dup_name, i)
+    }
+  }
+
   x
 }
 
