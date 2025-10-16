@@ -2,26 +2,175 @@
 % Please edit documentation in R/fdp.R
 \name{fdp}
 \alias{fdp}
-\title{Plot f-differential privacy}
+\title{Plot f-differential privacy trade-off functions}
 \usage{
 fdp(..., .legend = NULL, .tol = sqrt(.Machine$double.eps))
 }
 \arguments{
-\item{...}{f-differential privacy inputs to plot.}
+\item{...}{One or more f-DP trade-off specifications. Each argument can be a:
+\itemize{
+\item function (user-defined or built-in, e.g. \code{\link[=gdp]{gdp()}}, \code{\link[=epsdelta]{epsdelta()}}, \code{\link[=lap]{lap()}}, etc) that when called with a numeric vector \code{alpha} returns a data frame with columns \code{alpha} and \code{beta};
+\item data frame with columns \code{alpha} and \code{beta};
+\item numeric vector of length equal to the internal alpha grid (interpreted as \code{beta}).
+}
+Arguments may be named to control legend labels.
+See Details for full explanation of different ways to pass these arguments.}
 
-\item{.legend}{A title for the colour legend, by default there is no title.}
+\item{.legend}{Character string giving the legend title.
+Use \code{NULL} (default) for no title.}
+
+\item{.tol}{Numeric tolerance used when:
+\itemize{
+\item Validating \eqn{\beta}, \code{beta <= 1 - alpha + .tol}.
+\item Checking convexity for objects forced to draw as lines.
+}}
 }
 \value{
-A ggplot2 object which will plot
+A \code{ggplot2} object displaying the supplied trade-off functions (and points, if applicable).
+It can be further modified with additional \code{ggplot2} layers.
 }
 \description{
-Plots an f-differential privacy trade off function
+Produce a comparative plot of one or more (analytic or empirical) f-differential privacy trade-off functions.
 }
 \details{
-TODO description
+This is the main plotting function in the package, which produces plots of f-differential privacy (f-DP) trade-off functions in the style shown in the original f-DP paper (Dong et al., 2022).
+If you would like a reminder of the formal definition of f-DP, please see further down this documentation page in the "Formal definition" Section.
+
+The \code{...} arguments define the trade-off functions to be plotted and can be:
+\itemize{
+\item Built-in analytic trade-off function generators such as \code{\link[=gdp]{gdp()}}, \code{\link[=epsdelta]{epsdelta()}}, \code{\link[=lap]{lap()}}.
+\item User-defined functions defining trade-off functions.
+\item Data frames containing an \code{alpha} and \code{beta} column.
+\item Numeric vectors interpreted as a sequence of \code{beta} values over a canonical grid of Type-I error rates \code{alpha = seq(0, 1, by = 0.01)}.
 }
+
+We cover each of these cases in more detail in the subsequent sub-sections.
+After that is a discussion of the two main approaches to modifying the legend labels.
+\subsection{Built-in analytic trade-off function generators}{
+
+Most built-in trade-off function generators will take one or more arguments specifying the level of differential privacy, for example, \code{gdp(0.5)} corresponding to \eqn{\mu=0.5}-Gaussian differential privacy.
+
+These function calls can be passed directly, eg \code{fdp(gdp(0.5))}, and will automatically provide suitable legend names in the plot, including the detail of any argument specification.
+So the example \code{fdp(gdp(0.5))} results in a legend label "0.5-GDP".
+}
+
+\subsection{User-defined trade-off functions}{
+
+Custom trade-off functions should accept a vector of Type-I error values, \eqn{\alpha}, and return the corresponding vector of Type-II error values, \eqn{\beta}.
+In the simplest case, the user defined function will accept a single argument, so in the (unrealistic) perfect privacy setting:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{my_fdp <- function(a) \{
+  1 - a
+\}
+}\if{html}{\out{</div>}}
+
+This can then be plotted by calling \code{fdp(my_fdp)}.
+
+However, often there will be a need to pass additional arguments.
+This is supported using the direct calling mechanism, so assume an axis offset is required for the above unrealistic example:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{my_fdp <- function(a, off) \{
+  pmax(0, 1 - a - off)
+\}
+}\if{html}{\out{</div>}}
+
+This is now called by using the dummy variable \code{alpha} (which need not be defined in your calling environment), \code{fdp(my_fdp(alpha, 0.1))}, which will produce the trade-off function curve with offset 0.1.
+}
+
+\subsection{Data frames}{
+
+One need not define a trade-off function explicitly, it can be implicitly defined by giving a set of coordinates \eqn{\{(\alpha_i, \beta_i)\}_{i=1}^n} in a two-column data frame with columns named \code{alpha} and \code{beta}.
+These coordinates will be linearly interpolated to produce the trade-off function curve.
+For example
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{my_fdp <- data.frame(alpha = c(0, 0.25, 1), beta = c(1, 0.25, 0))
+}\if{html}{\out{</div>}}
+
+Can be used to produce the f-DP curve corresponding to \eqn{\varepsilon\approx1.09861}-differential privacy by then calling \code{fdp(my_fdp)}.
+Of course, that particular example is more easily produced using the built-in analytic trade-off function generator \code{\link[=epsdelta]{epsdelta()}} by calling \code{fdp(epsdelta(1.09861))}.
+}
+
+\subsection{Numeric vectors}{
+
+Finally, it is possible to simply provide a vector of \eqn{\beta} values at the grid of \eqn{\alpha} values that \code{fdp()} uses internally for plotting --- that is, at the values \code{seq(0.0, 1.0, by = 0.01)}.
+For example,
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{a <- seq(0.0, 1.0, by = 0.01)
+my_fdp <- 1 - a
+}\if{html}{\out{</div>}}
+
+would then produce the (unrealistic) perfect f-DP privacy curve by calling \code{fdp(my_fdp)}.
+}
+
+\subsection{Legend labels}{
+
+As discussed above, built-in analytic trade-off function generators will provide automatic legend labels that make sense for their particular trade-off function.
+In all other cases, the default will be for the legend label to equal the function, data frame, or numeric vector variable name used when calling \code{fdp()}.
+Thus, in all the examples above where \code{my_fdp} was used as the name of the function/data frame/vector the default legend label will be simply "my_fdp".
+
+This default can be overridden in two ways:
+\enumerate{
+\item by using an argument name.
+For example, to set the legend label to "hello" in the user-defined function with offset, one would call \code{fdp(hello = my_fdp(alpha, 0.1))}.
+This also works with spaces or special characters by using backtick quoted argument names, for example \code{fdp(`So cool!` = my_fdp(alpha, 0.1))}.
+\item by modifying the object passed with \code{\link[=fdp_name]{fdp_name()}} in advance.
+See the help file for that function for further details.
+}
+}
+
+\subsection{Drawing method and validation}{
+
+By default, built-in and user-defined function arguments will be plotted as a trade-off function curve.
+This means that they will first be checked to ensure the rendered line is indeed a valid trade-off function: that is, convex, non-increasing and less than \eqn{1-\alpha} (however, technically continuity cannot be checked with a finite number of calls to a black-box function).
+If a problem is detected an error will be thrown.
+\strong{Note} that due to the finite precision nature of computers, it might be that these validity checks throw a false alarm, in which case you may use the \code{.tol} argument to increase the tolerance within which these validity checks must pass.
+
+In contrast, data frame/vector arguments are plotted differently depending on their size.
+If there are at least 100 rows/elements then these will be treated in the same way as built-in and user-defined function arguments, with trade-off function validity checks.
+However, if there are fewer rows/elements, then these will be treated as merely a collection of points, the only check being that they all lie below the \eqn{\beta = 1-\alpha} line.
+Those points will then be plotted, together with the lower convex hull which corresponds to the lower bounding trade-off function for that collection of points.
+
+This default behaviour of validating and drawing a line versus computing lower convex hull and plotting points can be controlled with the \code{\link[=fdp_point]{fdp_point()}} and \code{\link[=fdp_line]{fdp_line()}} functions.
+See those help files for further details.
+
+A final performance note: all function type arguments are evaluated on a uniform grid \code{alpha = seq(0, 1, 0.01)}.
+To use a custom resolution, supply an explicit data frame instead of a function.
+}
+}
+\section{Formal definition (Dong et al., 2022)}{
+For any two probability distributions \eqn{P} and \eqn{Q} on the same space, the trade-off function \eqn{T(P,Q) \colon [0,1] \to [0,1]} characterises the optimal relationship between Type I and Type II errors in a hypothesis test distinguishing between them. It is defined as:
+\deqn{T(P, Q)(\alpha) = \inf \left\{ \beta_\phi \colon \alpha_\phi \leq \alpha \right\}}
+where the infimum is taken over all measurable rejection rules \eqn{\phi}.
+The terms \eqn{\alpha_\phi = \mathbb{E}_P[\phi]} and \eqn{\beta_\phi = 1 - \mathbb{E}_Q[\phi]} represent the Type I and Type II errors, respectively.
+
+A function \eqn{f \colon [0,1] \to [0,1]} is a trade-off function if and only if it is convex, continuous, non-increasing, and satisfies \eqn{f(x) \le 1-x} for all \eqn{x \in [0,1]}.
+
+In the context of differential privacy, we are interested in the distributions of the output of a randomised algorithm when run on two neighbouring datasets (datasets that differ in a single record), \eqn{S} and \eqn{S'}. Let \eqn{M} be a randomised algorithm which has output probability distribution denoted \eqn{M(S)} when applied to dataset \eqn{S}. Then, each pair of neighbouring datasets generate a specific trade-off function \eqn{T(M(S), M(S'))} which characterises how hard it is to distinguish between whether dataset \eqn{S} or \eqn{S'} has been used to produce the released output. Considering all possible neighbouring datasets leads to a family of trade-off functions, the lower bound of which determines the privacy of the randomised algorithm.
+
+More formally, let \eqn{f} be a trade-off function.
+A randomised algorithm \eqn{M} is said to be \eqn{f}-differentially private (\eqn{f}-DP) if for any pair of neighbouring datasets \eqn{S} and \eqn{S'}, the following condition holds:
+\deqn{T(M(S), M(S')) \ge f}
+This definition means that the task of distinguishing whether the mechanism was run on dataset \eqn{S} or its neighbour \eqn{S'} is at least as difficult as distinguishing between two canonical distributions whose trade-off function is \eqn{f}.
+
+Therefore, this function is concerned with plotting \eqn{T(P,Q) \colon [0,1] \to [0,1]} or \eqn{f \colon [0,1] \to [0,1]}.
+That is, plotting a function which returns the smallest type-II error for a specified type-I error rate.
+}
+
 \examples{
-#fdp(epsdelta(1,0.1), gdp(1), "a"=gdp(0.5), tst=data.frame(alpha=c(1,0.5,0),beta=c(0,0.3,1)), asd=data.frame(alpha=c(1,0.4,0),beta=c(0,0.51,1)))
+# Plotting mu=1 Gaussian differential privacy
+fdp(gdp(1))
+
+# Plotting the f_(epsilon,delta) curve corresponding to (1, 0.1)-differential privacy
+fdp(epsdelta(1, 0.1))
+
+# These can be plotted together for comparison
+fdp(gdp(1), epsdelta(1, 0.1))
+
+# The same curves custom labels and a custom legend header
+fdp("Gaussian DP" = gdp(1),
+    "Classical DP" = epsdelta(1, 0.1),
+    .legend = "Methods")
+
 }
 \references{
 Andrew, A. M. (1979). “Another efficient algorithm for convex hulls in two dimensions”. \emph{Information Processing Letters}, \strong{9}(5), 216–219. \doi{10.1016/0020-0190(79)90072-3}.
