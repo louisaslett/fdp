@@ -115,7 +115,7 @@
 #' In the context of differential privacy, we are interested in the distributions of the output of a randomised algorithm when run on two neighbouring datasets (datasets that differ in a single record), \eqn{S} and \eqn{S'}. Let \eqn{M} be a randomised algorithm which has output probability distribution denoted \eqn{M(S)} when applied to dataset \eqn{S}. Then, each pair of neighbouring datasets generate a specific trade-off function \eqn{T(M(S), M(S'))} which characterises how hard it is to distinguish between whether dataset \eqn{S} or \eqn{S'} has been used to produce the released output. Considering all possible neighbouring datasets leads to a family of trade-off functions, the lower bound of which determines the privacy of the randomised algorithm.
 #'
 #' More formally, let \eqn{f} be a trade-off function.
-#' A randomised algorithm \eqn{M} is said to be \eqn{f}-differentially private (\eqn{f}-DP) if for any pair of neighbouring datasets \eqn{S} and \eqn{S'}, the following condition holds:
+#' A randomised algorithm \eqn{M} is said to be \eqn{f}-differentially private (f-DP) if for any pair of neighbouring datasets \eqn{S} and \eqn{S'}, the following condition holds:
 #' \deqn{T(M(S), M(S')) \ge f}
 #' This definition means that the task of distinguishing whether the mechanism was run on dataset \eqn{S} or its neighbour \eqn{S'} is at least as difficult as distinguishing between two canonical distributions whose trade-off function is \eqn{f}.
 #'

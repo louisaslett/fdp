@@ -24,18 +24,18 @@ When called:
 }
 }
 \description{
-The \code{epsdelta} function constructs the trade-off function corresponding to the classical \eqn{(\varepsilon, \delta)}-differential privacy guarantee.
+Constructs the trade-off function corresponding to the classical \eqn{(\varepsilon, \delta)}-differential privacy guarantee.
 This is the f-DP representation of the approximate differential privacy definition, which allows a small probability \eqn{\delta} of privacy breach (if \eqn{\delta > 0}) while maintaining \eqn{\varepsilon}-differential privacy with probability \eqn{1-\delta}.
 
 The resulting trade-off function is piecewise linear with two segments, reflecting the geometry of \eqn{(\varepsilon, \delta)}-DP in the hypothesis testing framework.
 The function returned can be called either without arguments to retrieve the underlying data points, or with an \code{alpha} argument to evaluate the trade-off at specific Type-I error rates.
 }
 \details{
-Creates an \eqn{(\varepsilon, \delta)}-differential privacy trade-off function for use in f-DP analysis and visualization.
+Creates an \eqn{(\varepsilon, \delta)}-differential privacy trade-off function for use in f-DP analysis and visualisation.
 If you would like a reminder of the formal definition of \eqn{(\varepsilon, \delta)}-DP, please see further down this documentation page in the "Formal definition" Section.
 
 The function returns a closure that stores the \eqn{\varepsilon} and \eqn{\delta} parameters in its environment.
-This function can be called with or without argument specified, either to obtain the skeleton or particular Type-II error rates for given Type-I errors respectively.
+This function can be called with or without arguments supplied, either to obtain the skeleton or particular Type-II error rates for given Type-I errors respectively.
 }
 \section{Formal definition}{
 Classical \eqn{(\varepsilon, \delta)}-differential privacy (Dwork et al., 2006a,b) states that a randomised mechanism \eqn{M} satisfies \eqn{(\varepsilon, \delta)}-DP if for all neighbouring datasets \eqn{S} and \eqn{S'} that differ in a single observation, and any event \eqn{E},
@@ -79,6 +79,9 @@ Dwork, C., McSherry, F., Nissim, K. and Smith, A. (2006b) “Calibrating Noise t
 }
 \seealso{
 \code{\link[=fdp]{fdp()}} for plotting trade-off functions,
-\code{\link[=gdp]{gdp()}} for Gaussian differential privacy,
+\code{\link[=est_epsdelta]{est_epsdelta()}} for finding the choice of \eqn{\varepsilon} and \eqn{\delta} that lower bounds a collection of trade-off functions.
+
+Additional trade-off functions can be found in
+\code{\link[=gdp]{gdp()}} for Gaussian differential privacy, and
 \code{\link[=lap]{lap()}} for Laplace differential privacy.
 }

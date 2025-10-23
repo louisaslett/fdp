@@ -1,18 +1,18 @@
 #' (epsilon, delta)-differential privacy trade-off function
 #'
 #' @description
-#' The `epsdelta` function constructs the trade-off function corresponding to the classical \eqn{(\varepsilon, \delta)}-differential privacy guarantee.
+#' Constructs the trade-off function corresponding to the classical \eqn{(\varepsilon, \delta)}-differential privacy guarantee.
 #' This is the f-DP representation of the approximate differential privacy definition, which allows a small probability \eqn{\delta} of privacy breach (if \eqn{\delta > 0}) while maintaining \eqn{\varepsilon}-differential privacy with probability \eqn{1-\delta}.
 #'
 #' The resulting trade-off function is piecewise linear with two segments, reflecting the geometry of \eqn{(\varepsilon, \delta)}-DP in the hypothesis testing framework.
 #' The function returned can be called either without arguments to retrieve the underlying data points, or with an `alpha` argument to evaluate the trade-off at specific Type-I error rates.
 #'
 #' @details
-#' Creates an \eqn{(\varepsilon, \delta)}-differential privacy trade-off function for use in f-DP analysis and visualization.
+#' Creates an \eqn{(\varepsilon, \delta)}-differential privacy trade-off function for use in f-DP analysis and visualisation.
 #' If you would like a reminder of the formal definition of \eqn{(\varepsilon, \delta)}-DP, please see further down this documentation page in the "Formal definition" Section.
 #'
 #' The function returns a closure that stores the \eqn{\varepsilon} and \eqn{\delta} parameters in its environment.
-#' This function can be called with or without argument specified, either to obtain the skeleton or particular Type-II error rates for given Type-I errors respectively.
+#' This function can be called with or without arguments supplied, either to obtain the skeleton or particular Type-II error rates for given Type-I errors respectively.
 #'
 #' # Formal definition
 #'
@@ -49,7 +49,10 @@
 #'
 #' @seealso
 #' [fdp()] for plotting trade-off functions,
-#' [gdp()] for Gaussian differential privacy,
+#' [est_epsdelta()] for finding the choice of \eqn{\varepsilon} and \eqn{\delta} that lower bounds a collection of trade-off functions.
+#' 
+#' Additional trade-off functions can be found in
+#' [gdp()] for Gaussian differential privacy, and
 #' [lap()] for Laplace differential privacy.
 #'
 #' @export
