@@ -2,25 +2,89 @@
 % Please edit documentation in R/gdp.R
 \name{gdp}
 \alias{gdp}
-\title{Gaussian differential privacy trade off function}
+\title{Gaussian differential privacy trade-off function}
 \usage{
 gdp(mu = 1)
 }
 \arguments{
-\item{mu}{The GDP privacy parameter.}
+\item{mu}{Numeric scalar specifying the \eqn{\mu} privacy parameter.
+Must be non-negative.}
 }
 \value{
-A GDP function
+A function of class \code{c("fdp_gdp_tradeoff", "function")} that computes the \eqn{\mu}-GDP trade-off function.
+
+When called:
+\itemize{
+\item \strong{Without arguments}: Returns a data frame with columns \code{alpha} and \code{beta} containing points on a canonical grid (\code{alpha = seq(0, 1, by = 0.01)}) of the trade-off function.
+\item \strong{With an \code{alpha} argument}: Returns a data frame with columns \code{alpha} and \code{beta} containing the Type-II error values corresponding to the specified Type-I error rates.
+}
 }
 \description{
-Creates a Gaussian differential privacy trade off function
+Constructs the trade-off function corresponding to \eqn{\mu}-Gaussian differential privacy (GDP).
+This framework, introduced by Dong et al. (2022), provides a natural privacy guarantee for mechanisms based on Gaussian noise, typically offering tighter composition properties and a better privacy-utility trade-off than classical \eqn{(\varepsilon, \delta)}-differential privacy.
 }
 \details{
-TODO description
+Creates a \eqn{\mu}-Gaussian differential privacy trade-off function for use in f-DP analysis and visualisation.
+If you would like a reminder of the formal definition of \eqn{\mu}-GDP, please see further down this documentation page in the "Formal definition" Section.
+
+The function returns a closure that stores the \eqn{\mu} parameter in its environment.
+This function can be called with or without argument supplied, either to obtain points on a canonical grid or particular Type-II error rates for given Type-I errors respectively.
 }
+\section{Formal definition}{
+Gaussian differential privacy (Dong et al., 2022) arises as the trade-off function corresponding to distinguishing between two Normal distributions with unit variance and means differing by \eqn{\mu}.
+Without loss of generality, the trade-off function is therefore,
+\deqn{G_\mu \coloneqq T\left(N(0, 1), N(\mu, 1)\right) \quad\text{for}\quad \mu \ge 0.}
+This leads to,
+\deqn{G_\mu(\alpha) = \Phi\left(\Phi^{-1}(1-\alpha)-\mu\right)}
+where \eqn{\Phi} is the standard Normal cumulative distribution function.
+
+The most natural way to satisfy \eqn{\mu}-GDP is by adding Gaussian noise to construct the randomised algorithm.
+Theorem 1 in Dong et al. (2022) identifies the correct variance of that noise for a given sensitivity of the statistic to be released.
+Let \eqn{\theta(S)} be the statistic of the data \eqn{S} which is to be released. Then the \emph{Gaussian mechanism} is defined to be
+\deqn{M(S) \coloneqq \theta(S) + \eta}
+where \eqn{\eta \sim N(0, \Delta(\theta)^2 / \mu^2)} and,
+\deqn{\Delta(\theta) \coloneqq \sup_{S, S'} |\theta(S) - \theta(S')|}
+the supremum being taken over neighbouring data sets.
+The randomised algorithm \eqn{M(\cdot)} is then a \eqn{\mu}-GDP release of \eqn{\theta(S)}.
+
+More generally, \emph{any} mechanism \eqn{M(\cdot)} satisfies \eqn{\mu}-GDP if,
+\deqn{T\left(M(S), M(S')\right) \ge G_\mu}
+for all neighbouring data sets \eqn{S, S'}.
+In particular, one can seek the minimal \eqn{\mu} for a collection of trade-off functions using \code{\link[=est_gdp]{est_gdp()}}.
+}
+
 \examples{
-#gdp(0.5)
+# Gaussian DP with mu = 1
+gdp_1 <- gdp(1.0)
+gdp_1
+gdp_1()  # View points on the canonical grid
+
+# Stronger privacy with mu = 0.5
+gdp_strong <- gdp(0.5)
+gdp_strong
+
+# Evaluate at specific Type-I error rates
+gdp_1(c(0.05, 0.1, 0.25, 0.5))
+
+# Plot and compare different mu values
+fdp(gdp(0.5),
+    gdp(1.0),
+    gdp(2.0))
+
+# Compare Gaussian DP with classical (epsilon, delta)-DP
+fdp(gdp(1.0),
+    epsdelta(1.0),
+    epsdelta(1.0, 0.01),
+    .legend = "Privacy Mechanism")
 }
 \references{
 Dong, J., Roth, A. and Su, W.J. (2022). “Gaussian Differential Privacy”. \emph{Journal of the Royal Statistical Society Series B}, \strong{84}(1), 3–37. \doi{10.1111/rssb.12454}.
+}
+\seealso{
+\code{\link[=fdp]{fdp()}} for plotting trade-off functions,
+\code{\link[=est_gdp]{est_gdp()}} for finding the choice of \eqn{\mu} that lower bounds a collection of trade-off functions.
+
+Additional trade-off functions can be found in
+\code{\link[=epsdelta]{epsdelta()}} for classical \eqn{(\varepsilon, \delta)}-differential privacy, and
+\code{\link[=lap]{lap()}} for Laplace differential privacy.
 }
