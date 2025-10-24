@@ -35,7 +35,7 @@ est_epsdelta <- function(x, epsilon = NULL, delta = NULL, dp = 2L) {
   alpha <- seq(0.0, 1.0, by = 0.01)
 
   target <- preprocess_args(list(est_epsdelta = substitute(x)), alpha)[[1L]]
-  g <- function(epsilon, delta, target) { # if -'ve, no bound; if +'ve, bounds.
+  g <- function(epsilon, delta, target) {
     x <- target[["beta"]] - epsdelta(epsilon, delta)(target[["alpha"]])[["beta"]]
     if (any(x < 0.0)) {
       return(sum(x[x < 0.0]))
@@ -44,39 +44,48 @@ est_epsdelta <- function(x, epsilon = NULL, delta = NULL, dp = 2L) {
   }
 
   if (is.null(epsilon)) {
-    # Find epsilon
-    if (min(g(30.0, delta, target)) < 0.0) {
-      cli::cli_abort("Unable to find any \u03B5 < 30 which lower bounds provided trade-off points. May not be bounded by (\u03B5, \u03B4 = {delta})-differential privacy trade-off function.")
-    }
-    if (min(g(10.0^(-dp), delta, target)) > 0.0) {
-      epsilon <- 10.0^(-dp)
-    } else {
-      epsilon <- stats::uniroot(g,
-                                delta = delta,
-                                target = target,
-                                lower = 10.0^(-dp), upper = 30.0)$root
-      epsilon <- ceiling(epsilon * 10.0^dp) * 10.0^(-dp)
-      while (min(g(epsilon, delta, target)) < 0.0) {
-        epsilon <- epsilon + 10.0^(-dp)
-      }
-    }
+    epsilon <- find_epsilon(delta, target, dp, g)
   } else {
-    # Find delta
-    if (min(g(epsilon, 1.0, target)) < 0.0) {
-      cli::cli_abort("Unable to find a \u03B4 < 1.0 which lower bounds provided trade-off points. May not be bounded by (\u03B5 = {epsilon}, \u03B4)-differential privacy trade-off function.")
-    }
-    if (min(g(epsilon, 0.0, target)) > 0.0) {
-      delta <- 0.0
-    } else {
-      delta <- stats::uniroot(g,
-                              epsilon = epsilon,
-                              target = target,
-                              lower = 0.0, upper = 1.0)$root
-      delta <- ceiling(delta * 10.0^dp) * 10.0^(-dp)
-      while (min(g(epsilon, delta, target)) < 0.0) {
-        delta <- delta + 10.0^(-dp)
-      }
-    }
+    delta <- find_delta(epsilon, target, dp, g)
   }
+
   epsdelta(epsilon, delta)
+}
+
+find_epsilon <- function(delta, target, dp, g) {
+  if (g(30.0, delta, target) < 0.0) {
+    cli::cli_abort("Unable to find any \u03B5 < 30 which lower bounds provided trade-off points. May not be bounded by (\u03B5, \u03B4 = {delta})-differential privacy trade-off function.")
+  }
+  if (g(10.0^(-dp), delta, target) > 0.0) {
+    return(10.0^(-dp))
+  }
+
+  epsilon <- stats::uniroot(g,
+                            delta = delta,
+                            target = target,
+                            lower = 10.0^(-dp), upper = 30.0)$root
+  epsilon <- ceiling(epsilon * 10.0^dp) * 10.0^(-dp)
+  while (g(epsilon, delta, target) < -.Machine$double.eps) {
+    epsilon <- epsilon + 10.0^(-dp)
+  }
+  epsilon
+}
+
+find_delta <- function(epsilon, target, dp, g) {
+  if (g(epsilon, 1.0, target) < 0.0) {
+    cli::cli_abort("Unable to find a \u03B4 < 1.0 which lower bounds provided trade-off points. May not be bounded by (\u03B5 = {epsilon}, \u03B4)-differential privacy trade-off function.")
+  }
+  if (g(epsilon, 0.0, target) > 0.0) {
+    return(0.0)
+  }
+
+  delta <- stats::uniroot(g,
+                          epsilon = epsilon,
+                          target = target,
+                          lower = 0.0, upper = 1.0)$root
+  delta <- ceiling(delta * 10.0^dp) * 10.0^(-dp)
+  while (g(epsilon, delta, target) < -.Machine$double.eps) {
+    delta <- delta + 10.0^(-dp)
+  }
+  delta
 }
