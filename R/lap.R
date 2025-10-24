@@ -22,16 +22,21 @@ lap <- function(mu = 1.0) {
 
   f <- function(alpha) {
     if (missing(alpha)) {
-      x <- data.frame(alpha = seq(0.0, 1.0, by = 0.01))
+      x <- data.frame(alpha = unique(c(0.0,
+                                       exp(-mu)/2.0,
+                                       seq(min(floor(100*exp(-mu)/2+1)/100, 0.5),
+                                           0.5,
+                                           by = 0.01),
+                                       1.0)))
     } else {
       check_alpha(alpha)
       x <- data.frame(alpha = alpha)
     }
-    x$beta <- ifelse(alpha < exp(-mu)/2,
-                     1 - alpha * exp(mu),
-                     ifelse(alpha <= 0.5,
-                            exp(-mu)/(4*alpha),
-                            exp(-mu)*(1-alpha)))
+    x$beta <- ifelse(x$alpha < exp(-mu)/2,
+                     1 - x$alpha * exp(mu),
+                     ifelse(x$alpha <= 0.5,
+                            exp(-mu)/(4*x$alpha),
+                            exp(-mu)*(1-x$alpha)))
     x <- fdp_name(x, paste0(mu, "-Laplace"))
     x
   }
