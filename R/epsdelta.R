@@ -27,9 +27,9 @@
 #' Dong, J., Roth, A. and Su, W.J. (2022). “Gaussian Differential Privacy”. _Journal of the Royal Statistical Society Series B_, **84**(1), 3–37. \doi{10.1111/rssb.12454}.
 #'
 #' Dwork, C., Kenthapadi, K., McSherry, F., Mironov, I. and Naor, M. (2006a) “Our Data, Ourselves: Privacy Via Distributed Noise Generation”. In: _Advances in Cryptology - EUROCRYPT 2006_, 486–503. \doi{10.1007/11761679_29}.
-#' 
+#'
 #' Dwork, C., McSherry, F., Nissim, K. and Smith, A. (2006b) “Calibrating Noise to Sensitivity in Private Data Analysis”. In: _Theory of Cryptography_, 265–284. \doi{10.1007/11681878_14}.
-#' 
+#'
 #' @param epsilon
 #'        Numeric scalar specifying the \eqn{\varepsilon} privacy parameter.
 #'        Must be non-negative.
@@ -50,7 +50,7 @@
 #' @seealso
 #' [fdp()] for plotting trade-off functions,
 #' [est_epsdelta()] for finding the choice of \eqn{\varepsilon} and \eqn{\delta} that lower bounds a collection of trade-off functions.
-#' 
+#'
 #' Additional trade-off functions can be found in
 #' [gdp()] for Gaussian differential privacy, and
 #' [lap()] for Laplace differential privacy.

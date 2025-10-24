@@ -19,7 +19,7 @@
 #' This leads to,
 #' \deqn{G_\mu(\alpha) = \Phi\left(\Phi^{-1}(1-\alpha)-\mu\right)}
 #' where \eqn{\Phi} is the standard Normal cumulative distribution function.
-#' 
+#'
 #' The most natural way to satisfy \eqn{\mu}-GDP is by adding Gaussian noise to construct the randomised algorithm.
 #' Theorem 1 in Dong et al. (2022) identifies the correct variance of that noise for a given sensitivity of the statistic to be released.
 #' Let \eqn{\theta(S)} be the statistic of the data \eqn{S} which is to be released. Then the *Gaussian mechanism* is defined to be
@@ -28,7 +28,7 @@
 #' \deqn{\Delta(\theta) \coloneqq \sup_{S, S'} |\theta(S) - \theta(S')|}
 #' the supremum being taken over neighbouring data sets.
 #' The randomised algorithm \eqn{M(\cdot)} is then a \eqn{\mu}-GDP release of \eqn{\theta(S)}.
-#' 
+#'
 #' More generally, *any* mechanism \eqn{M(\cdot)} satisfies \eqn{\mu}-GDP if,
 #' \deqn{T\left(M(S), M(S')\right) \ge G_\mu}
 #' for all neighbouring data sets \eqn{S, S'}.
@@ -53,7 +53,7 @@
 #' @seealso
 #' [fdp()] for plotting trade-off functions,
 #' [est_gdp()] for finding the choice of \eqn{\mu} that lower bounds a collection of trade-off functions.
-#' 
+#'
 #' Additional trade-off functions can be found in
 #' [epsdelta()] for classical \eqn{(\varepsilon, \delta)}-differential privacy, and
 #' [lap()] for Laplace differential privacy.

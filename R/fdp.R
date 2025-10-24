@@ -14,11 +14,11 @@
 #'
 #' We cover each of these cases in more detail in the subsequent sub-sections.
 #' After that is a discussion of the two main approaches to modifying the legend labels.
-#' 
+#'
 #' ## Built-in analytic trade-off function generators
-#' 
+#'
 #' Most built-in trade-off function generators will take one or more arguments specifying the level of differential privacy, for example, `gdp(0.5)` corresponding to \eqn{\mu=0.5}-Gaussian differential privacy.
-#' 
+#'
 #' These function calls can be passed directly, eg `fdp(gdp(0.5))`, and will automatically provide suitable legend names in the plot, including the detail of any argument specification.
 #' So the example `fdp(gdp(0.5))` results in a legend label "0.5-GDP".
 #'
@@ -26,80 +26,80 @@
 #'
 #' Custom trade-off functions should accept a vector of Type-I error values, \eqn{\alpha}, and return the corresponding vector of Type-II error values, \eqn{\beta}.
 #' In the simplest case, the user defined function will accept a single argument, so in the (unrealistic) perfect privacy setting:
-#' 
+#'
 #' ```r
 #' my_fdp <- function(a) {
 #'   1 - a
 #' }
 #' ```
-#' 
+#'
 #' This can then be plotted by calling `fdp(my_fdp)`.
-#' 
+#'
 #' However, often there will be a need to pass additional arguments.
 #' This is supported using the direct calling mechanism, so assume an axis offset is required for the above unrealistic example:
-#' 
+#'
 #' ```r
 #' my_fdp <- function(a, off) {
 #'   pmax(0, 1 - a - off)
 #' }
 #' ```
-#' 
+#'
 #' This is now called by using the dummy variable `alpha` (which need not be defined in your calling environment), `fdp(my_fdp(alpha, 0.1))`, which will produce the trade-off function curve with offset 0.1.
-#' 
+#'
 #' ## Data frames
-#' 
+#'
 #' One need not define a trade-off function explicitly, it can be implicitly defined by giving a set of coordinates \eqn{\{(\alpha_i, \beta_i)\}_{i=1}^n} in a two-column data frame with columns named `alpha` and `beta`.
 #' These coordinates will be linearly interpolated to produce the trade-off function curve.
 #' For example
-#' 
+#'
 #' ```r
 #' my_fdp <- data.frame(alpha = c(0, 0.25, 1), beta = c(1, 0.25, 0))
 #' ```
-#' 
+#'
 #' Can be used to produce the f-DP curve corresponding to \eqn{\varepsilon\approx1.09861}-differential privacy by then calling `fdp(my_fdp)`.
 #' Of course, that particular example is more easily produced using the built-in analytic trade-off function generator [epsdelta()] by calling `fdp(epsdelta(1.09861))`.
-#' 
+#'
 #' ## Numeric vectors
-#' 
+#'
 #' Finally, it is possible to simply provide a vector of \eqn{\beta} values at the grid of \eqn{\alpha} values that `fdp()` uses internally for plotting --- that is, at the values `seq(0.0, 1.0, by = 0.01)`.
 #' For example,
-#' 
+#'
 #' ```r
 #' a <- seq(0.0, 1.0, by = 0.01)
 #' my_fdp <- 1 - a
 #' ```
-#' 
+#'
 #' would then produce the (unrealistic) perfect f-DP privacy curve by calling `fdp(my_fdp)`.
-#' 
+#'
 #' ## Legend labels
-#' 
+#'
 #' As discussed above, built-in analytic trade-off function generators will provide automatic legend labels that make sense for their particular trade-off function.
 #' In all other cases, the default will be for the legend label to equal the function, data frame, or numeric vector variable name used when calling `fdp()`.
 #' Thus, in all the examples above where `my_fdp` was used as the name of the function/data frame/vector the default legend label will be simply "my_fdp".
-#' 
+#'
 #' This default can be overridden in two ways:
-#' 
+#'
 #' 1.  by using an argument name.
 #'     For example, to set the legend label to "hello" in the user-defined function with offset, one would call `fdp(hello = my_fdp(alpha, 0.1))`.
 #'     This also works with spaces or special characters by using backtick quoted argument names, for example `` fdp(`So cool!` = my_fdp(alpha, 0.1)) ``.
 #' 1.  by modifying the object passed with [fdp_name()] in advance.
 #'     See the help file for that function for further details.
-#' 
+#'
 #' ## Drawing method and validation
-#' 
+#'
 #' By default, built-in and user-defined function arguments will be plotted as a trade-off function curve.
 #' This means that they will first be checked to ensure the rendered line is indeed a valid trade-off function: that is, convex, non-increasing and less than \eqn{1-\alpha} (however, technically continuity cannot be checked with a finite number of calls to a black-box function).
 #' If a problem is detected an error will be thrown.
 #' **Note** that due to the finite precision nature of computers, it might be that these validity checks throw a false alarm, in which case you may use the `.tol` argument to increase the tolerance within which these validity checks must pass.
-#' 
+#'
 #' In contrast, data frame/vector arguments are plotted differently depending on their size.
 #' If there are at least 100 rows/elements then these will be treated in the same way as built-in and user-defined function arguments, with trade-off function validity checks.
 #' However, if there are fewer rows/elements, then these will be treated as merely a collection of points, the only check being that they all lie below the \eqn{\beta = 1-\alpha} line.
 #' Those points will then be plotted, together with the lower convex hull which corresponds to the lower bounding trade-off function for that collection of points.
-#' 
+#'
 #' This default behaviour of validating and drawing a line versus computing lower convex hull and plotting points can be controlled with the [fdp_point()] and [fdp_line()] functions.
 #' See those help files for further details.
-#' 
+#'
 #' A final performance note: all function type arguments are evaluated on a uniform grid `alpha = seq(0, 1, 0.01)`.
 #' To use a custom resolution, supply an explicit data frame instead of a function.
 #'

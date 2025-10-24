@@ -16,7 +16,7 @@
 #' Laplace differential privacy arises as the trade-off function corresponding to distinguishing between two Laplace distributions with unit scale parameter and locations differing by \eqn{\mu}.
 #' Without loss of generality, the trade-off function is therefore,
 #' \deqn{L_\mu \coloneqq T\left(\text{Lap}(0, 1), \text{Lap}(\mu, 1)\right) \quad\text{for}\quad \mu \ge 0.}
-#' 
+#'
 #' The most natural way to satisfy \eqn{\mu}-Laplace DP is by adding Laplace noise to construct the randomised algorithm.
 #' This is the canonical noise mechanism used in classical \eqn{\varepsilon}-differential privacy.
 #' Let \eqn{\theta(S)} be the statistic of the data \eqn{S} which is to be released.
@@ -27,16 +27,16 @@
 #' the supremum being taken over neighbouring data sets.
 #' The randomised algorithm \eqn{M(\cdot)} is then a \eqn{\mu}-Laplace DP release of \eqn{\theta(S)}.
 #' In the classical regime, this corresponds to the Laplace mechanism which satisfies \eqn{(\varepsilon=\mu)}-differential privacy (Dwork et al., 2006).
-#' 
+#'
 #' More generally, *any* mechanism \eqn{M(\cdot)} satisfies \eqn{\mu}-Laplace DP if,
 #' \deqn{T\left(M(S), M(S')\right) \ge L_\mu}
 #' for all neighbouring data sets \eqn{S, S'}.
-#' 
+#'
 #' In the f-differential privacy framework, the canonical noise mechanism is Gaussian (see [gdp()]), but \eqn{\mu}-Laplace DP does arise as the trade-off function in the limit of the group privacy of \eqn{\varepsilon}-DP as the group size goes to infinity (see Proposition 7, Dong et al., 2022).
 #'
 #' @references
 #' Dong, J., Roth, A. and Su, W.J. (2022). “Gaussian Differential Privacy”. _Journal of the Royal Statistical Society Series B_, **84**(1), 3–37. \doi{10.1111/rssb.12454}.
-#' 
+#'
 #' Dwork, C., McSherry, F., Nissim, K. and Smith, A. (2006) “Calibrating Noise to Sensitivity in Private Data Analysis”. In: _Theory of Cryptography_, 265–284. \doi{10.1007/11681878_14}.
 #'
 #' @param mu
@@ -54,7 +54,7 @@
 #'
 #' @seealso
 #' [fdp()] for plotting trade-off functions.
-#' 
+#'
 #' Additional trade-off functions can be found in
 #' [gdp()] for Gaussian differential privacy, and
 #' [epsdelta()] for classical \eqn{(\varepsilon, \delta)}-differential privacy.
@@ -71,7 +71,7 @@
 #' fdp(lap(0.5),
 #'     lap(1.0),
 #'     lap(2.0))
-#' 
+#'
 #' # Notice that (epsilon=1)-differential privacy is indeed 1-Laplace DP
 #' # The gap between the lines is the ineffeciency in the privacy characterisation of classical differential privacy
 #' fdp(lap(1),
@@ -88,8 +88,8 @@ lap <- function(mu = 1.0) {
   f <- function(alpha) {
     if (missing(alpha)) {
       x <- data.frame(alpha = unique(c(0.0,
-                                       exp(-mu)/2.0,
-                                       seq(min(floor(100*exp(-mu)/2+1)/100, 0.5),
+                                       exp(-mu) / 2.0,
+                                       seq(min(floor(100.0 * exp(-mu) / 2.0 + 1.0) / 100.0, 0.5),
                                            0.5,
                                            by = 0.01),
                                        1.0)))
@@ -97,11 +97,18 @@ lap <- function(mu = 1.0) {
       check_alpha(alpha)
       x <- data.frame(alpha = alpha)
     }
-    x$beta <- ifelse(x$alpha < exp(-mu)/2,
-                     1 - x$alpha * exp(mu),
-                     ifelse(x$alpha <= 0.5,
-                            exp(-mu)/(4*x$alpha),
-                            exp(-mu)*(1-x$alpha)))
+
+    # Compute beta (avoiding nested ifelse)
+    x$beta <- numeric(nrow(x))
+    mask1 <- x$alpha < exp(-mu) / 2.0
+    mask2 <- x$alpha <= 0.5 & !mask1
+    mask3 <- !mask1 & !mask2
+
+    x$beta[mask1] <- 1.0 - x$alpha[mask1] * exp(mu)
+    x$beta[mask2] <- exp(-mu) / (4.0 * x$alpha[mask2])
+    x$beta[mask3] <- exp(-mu) * (1.0 - x$alpha[mask3])
+
+    # Done! Give a pretty name and return
     x <- fdp_name(x, paste0(mu, "-Laplace"))
     x
   }
