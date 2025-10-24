@@ -2,25 +2,88 @@
 % Please edit documentation in R/lap.R
 \name{lap}
 \alias{lap}
-\title{Laplace differential privacy trade off function}
+\title{Laplace differential privacy trade-off function}
 \usage{
 lap(mu = 1)
 }
 \arguments{
-\item{mu}{The Laplace privacy parameter.}
+\item{mu}{Numeric scalar specifying the \eqn{\mu} privacy parameter.
+Must be non-negative.}
 }
 \value{
-A Laplace trade-off function
+A function of class \code{c("fdp_lap_tradeoff", "function")} that computes the \eqn{\mu}-Laplace DP trade-off function.
+
+When called:
+\itemize{
+\item \strong{Without arguments}: Returns a data frame with columns \code{alpha} and \code{beta} containing the skeleton points of the trade-off function.
+\item \strong{With an \code{alpha} argument}: Returns a data frame with columns \code{alpha} and \code{beta} containing the Type-II error values corresponding to the specified Type-I error rates.
+}
 }
 \description{
-Creates a Laplace differential privacy trade off function
+Constructs the trade-off function corresponding to \eqn{\mu}-Laplace differential privacy.
+This corresponds to a randomised algorithm based on Laplace (double exponential) noise, which is the canonical mechanism in the original differential privacy framework (Dwork et al., 2006).
 }
 \details{
-TODO description
+Creates a \eqn{\mu}-Laplace differential privacy trade-off function for use in f-DP analysis and visualisation.
+If you would like a reminder of the formal definition of \eqn{\mu}-Laplace DP, please see further down this documentation page in the "Formal definition" Section.
+
+The function returns a closure that stores the \eqn{\mu} parameter in its environment.
+This function can be called with or without argument supplied, either to obtain points on a canonical grid or particular Type-II error rates for given Type-I errors respectively.
 }
+\section{Formal definition}{
+Laplace differential privacy arises as the trade-off function corresponding to distinguishing between two Laplace distributions with unit scale parameter and locations differing by \eqn{\mu}.
+Without loss of generality, the trade-off function is therefore,
+\deqn{L_\mu \coloneqq T\left(\text{Lap}(0, 1), \text{Lap}(\mu, 1)\right) \quad\text{for}\quad \mu \ge 0.}
+
+The most natural way to satisfy \eqn{\mu}-Laplace DP is by adding Laplace noise to construct the randomised algorithm.
+This is the canonical noise mechanism used in classical \eqn{\varepsilon}-differential privacy.
+Let \eqn{\theta(S)} be the statistic of the data \eqn{S} which is to be released.
+Then the \emph{Laplace mechanism} is defined to be
+\deqn{M(S) \coloneqq \theta(S) + \eta}
+where \eqn{\eta \sim \text{Lap}(0, \Delta(\theta) / \mu)} and,
+\deqn{\Delta(\theta) \coloneqq \sup_{S, S'} |\theta(S) - \theta(S')|}
+the supremum being taken over neighbouring data sets.
+The randomised algorithm \eqn{M(\cdot)} is then a \eqn{\mu}-Laplace DP release of \eqn{\theta(S)}.
+In the classical regime, this corresponds to the Laplace mechanism which satisfies \eqn{(\varepsilon=\mu)}-differential privacy (Dwork et al., 2006).
+
+More generally, \emph{any} mechanism \eqn{M(\cdot)} satisfies \eqn{\mu}-Laplace DP if,
+\deqn{T\left(M(S), M(S')\right) \ge L_\mu}
+for all neighbouring data sets \eqn{S, S'}.
+
+In the f-differential privacy framework, the canonical noise mechanism is Gaussian (see \code{\link[=gdp]{gdp()}}), but \eqn{\mu}-Laplace DP does arise as the trade-off function in the limit of the group privacy of \eqn{\varepsilon}-DP as the group size goes to infinity (see Proposition 7, Dong et al., 2022).
+}
+
 \examples{
-#lap(1)
+# Laplace DP with mu = 1
+lap_1 <- lap(1.0)
+lap_1
+lap_1()  # View points on the canonical grid
+
+# Plot and compare different mu values
+fdp(lap(0.5),
+    lap(1.0),
+    lap(2.0))
+
+# Notice that (epsilon=1)-differential privacy is indeed 1-Laplace DP
+# The gap between the lines is the ineffeciency in the privacy characterisation of classical differential privacy
+fdp(lap(1),
+    epsdelta(1))
+
+# Compare Laplace DP with Gaussian DP and classical (epsilon, delta)-DP
+fdp(lap(1.0),
+    gdp(1.0),
+    epsdelta(1.0),
+    .legend = "Privacy Mechanism")
 }
 \references{
 Dong, J., Roth, A. and Su, W.J. (2022). “Gaussian Differential Privacy”. \emph{Journal of the Royal Statistical Society Series B}, \strong{84}(1), 3–37. \doi{10.1111/rssb.12454}.
+
+Dwork, C., McSherry, F., Nissim, K. and Smith, A. (2006) “Calibrating Noise to Sensitivity in Private Data Analysis”. In: \emph{Theory of Cryptography}, 265–284. \doi{10.1007/11681878_14}.
+}
+\seealso{
+\code{\link[=fdp]{fdp()}} for plotting trade-off functions.
+
+Additional trade-off functions can be found in
+\code{\link[=gdp]{gdp()}} for Gaussian differential privacy, and
+\code{\link[=epsdelta]{epsdelta()}} for classical \eqn{(\varepsilon, \delta)}-differential privacy.
 }
