@@ -65,7 +65,8 @@ fdp(lap(0.5),
     lap(2.0))
 
 # Notice that (epsilon=1)-differential privacy is indeed 1-Laplace DP
-# The gap between the lines is the ineffeciency in the privacy characterisation of classical differential privacy
+# The gap between the lines is the inefficiency in the privacy
+# characterisation of classical differential privacy
 fdp(lap(1),
     epsdelta(1))
 
