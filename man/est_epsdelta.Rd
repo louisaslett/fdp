@@ -2,31 +2,112 @@
 % Please edit documentation in R/est_epsdelta.R
 \name{est_epsdelta}
 \alias{est_epsdelta}
-\title{Estimate (epsilon, delta)-differential privacy of trade off points}
+\title{(epsilon, delta)-differential privacy parameters lower bounding empirical trade-off points}
 \usage{
 est_epsdelta(x, epsilon = NULL, delta = NULL, dp = 2L)
 }
 \arguments{
-\item{x}{Add description from fdp to here.}
+\item{x}{One or more f-DP trade-off specifications to be lower bounded. Accepts the same flexible input types as \code{\link[=fdp]{fdp()}}:
+\itemize{
+\item A function (user-defined or built-in, e.g., \code{\link[=gdp]{gdp()}}) that when called with a numeric vector \code{alpha} returns a data frame with columns \code{alpha} and \code{beta};
+\item A data frame with columns \code{alpha} and \code{beta} containing empirical trade-off points;
+\item A numeric vector of length 101 (interpreted as \code{beta} values on the canonical grid \code{alpha = seq(0, 1, by = 0.01)}).
+}
+The function extracts all Type-I/Type-II error coordinates and finds the minimal \eqn{(\varepsilon, \delta)}-DP parameters lower bounding them.}
 
-\item{epsilon}{If specified, is the fixed epsilon to use with bounding attempted by varying delta.}
+\item{epsilon}{Optional numeric scalar specifying a fixed value of \eqn{\varepsilon \ge 0}.
+If supplied, the function searches for the minimal \eqn{\delta \in [0,1]} such that the \eqn{(\varepsilon, \delta)}-DP trade-off lower bounds \code{x}.
+Exactly one of \code{epsilon} or \code{delta} must be specified.
+Default is \code{NULL}.}
 
-\item{delta}{If specified, is the fixed delta to use with bounding attempted by varying epsilon.}
+\item{delta}{Optional numeric scalar specifying a fixed value of \eqn{\delta \in [0, 1]}.
+If supplied, the function searches for the minimal \eqn{\varepsilon \ge 0} such that the \eqn{(\varepsilon, \delta)}-DP trade-off lower bounds \code{x}.
+Exactly one of \code{epsilon} or \code{delta} must be specified.
+Default is \code{NULL}.}
 
-\item{dp}{The number of decimal places of accuracy to use when estimating the parameters of (epsilon, delta)-differential privacy.}
+\item{dp}{Integer scalar specifying the number of decimal places of precision for the result (with careful rounding employed to ensure the bound holds).
+Must be a non-negative integer.
+Default is \code{2L}.}
 }
 \value{
-An
+A function of class \code{c("fdp_epsdelta_tradeoff", "function")}, as returned by \code{\link[=epsdelta]{epsdelta()}}, representing the tightest \eqn{(\varepsilon, \delta)}-DP trade-off function that lower bounds the input \code{x}.
 }
 \description{
-Estimates the (epsilon, delta)-differential privacy of a set of trade off points
+Estimates the \eqn{(\varepsilon, \delta)}-differential privacy parameters that lower bound a given set of empirical trade-off points.
+This function uses numerical optimisation to identify the tightest \eqn{(\varepsilon, \delta)}-DP guarantee consistent with observed Type-I/Type-II error trade-offs, holding either \eqn{\varepsilon} or \eqn{\delta} fixed whilst optimising over the other parameter.
+\strong{Note:} due to the numerical optimisation involved, this is only an approximation.
 }
 \details{
-TODO description
+This function numerically solves an inverse problem in the f-differential privacy framework: given empirical trade-off points \eqn{\{(\alpha_i, \beta_i)\}_{i=1}^n} characterising the distinguishability between output distributions of a randomised mechanism on neighbouring datasets, find the minimal classical \eqn{(\varepsilon, \delta)}-DP parameters such that the \eqn{(\varepsilon, \delta)}-DP trade-off function lower bounds all observed points.
+
+\strong{Warning:} since this is a numerical optimisation on a finite set of trade-off points, there is no mathematical guarantee of correctness.
+As such, the \eqn{(\varepsilon, \delta)} found ought best to be viewed as an approximate lower bound on the true values, since there could be intermediate trade-off points that are not supplied which cause the true values to be larger.
+For example, consider:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{est_epsdelta(gdp(0.5)(), delta = 0)
+#> (ε, δ)-Differential Privacy Trade-off Function
+#>   Parameters:
+#>     ε = 1.45
+#>     δ = 0
+}\if{html}{\out{</div>}}
+
+Corollary 1, p.16, in Dong et al. (2022) means the exact answer here is \eqn{(\varepsilon = 1.45, \delta = 0.000544\dots)} and that indeed there does not in general exist any finite \eqn{\varepsilon} solution for \eqn{\delta = 0}.
+
+\strong{Note:} in fact, for lower bounding \eqn{\mu}-Gaussian Differential Privacy one should use \code{\link[=gdp_to_epsdelta]{gdp_to_epsdelta()}} which employs exact theoretical results from the literature!
+
+This function may be useful for post-hoc privacy auditing, privacy budget allocation, or mechanism comparison.
+\subsection{Mathematical formulation}{
+
+The \eqn{(\varepsilon, \delta)}-DP trade-off function \eqn{f_{\varepsilon,\delta} \colon [0,1] \to [0,1]} is piecewise linear (see \code{\link[=epsdelta]{epsdelta()}}).
+This function seeks parameters \eqn{(\varepsilon, \delta)} such that
+\deqn{f_{\varepsilon,\delta}(\alpha_i) \le \beta_i \quad \text{for all } i = 1, \ldots, n}
+whilst minimising either \eqn{\varepsilon} (if \code{delta} is fixed) or \eqn{\delta} (if \code{epsilon} is fixed).
+
+Exactly one of \code{epsilon} or \code{delta} must be specified by the user; the function then searches for the minimal value of the unspecified parameter.
+The optimisation first verifies whether any solution exists within reasonable bounds (\eqn{\varepsilon < 30} or \eqn{\delta < 1}), then constructs an objective measuring the signed vertical distance between the empirical points and the candidate \eqn{(\varepsilon, \delta)}-DP curve.
+A numerical root finder then seeks the parameter value where this crosses zero, with the solution rounded up to the specified decimal precision (\code{dp}).
+There are then checks that the rounded bound holds numerically, with incremental adjustment if necessary to guarantee \eqn{f_{\varepsilon,\delta}(\alpha_i) \le \beta_i} for all \eqn{i} within machine precision.
+}
 }
 \examples{
-#gdp(0.5)
+# Estimate epsilon given fixed delta for empirical trade-off points
+# Note: unrealistically small set of points, in practice this would be a
+#       collection of potentially thousands of points representing multiple
+#       trade-off functions, the collection of which should be lower bounded.
+empirical <- data.frame(
+  alpha = c(0.00, 0.05, 0.10, 0.25, 0.50, 1.00),
+  beta = c(1.00, 0.92, 0.85, 0.70, 0.45, 0.00)
+)
+result <- est_epsdelta(empirical, delta = 0.01)
+result  # Print the estimated parameters
+
+# Estimate delta given fixed epsilon
+result2 <- est_epsdelta(empirical, epsilon = 1.0)
+result2
+
+# Visualise the fit
+fdp(empirical, result, .legend = "Trade-off")
+
+# Find epsilon bounding a Gaussian DP mechanism with delta = 0.1 and compare
+# with the exactly computed values
+gdp_mechanism <- gdp(1.1)
+approx_dp <- est_epsdelta(gdp_mechanism, delta = 0.1)
+dp <- gdp_to_epsdelta(1.1, environment(approx_dp)$epsilon)
+fdp(gdp_mechanism, approx_dp, dp,
+    .legend = "Mechanism")
+
+# Compare precision levels
+result_2dp <- est_epsdelta(empirical, delta = 0.01, dp = 2L)
+result_4dp <- est_epsdelta(empirical, delta = 0.01, dp = 4L)
+fdp(empirical, result_2dp, result_4dp)
 }
 \references{
 Dong, J., Roth, A. and Su, W.J. (2022). “Gaussian Differential Privacy”. \emph{Journal of the Royal Statistical Society Series B}, \strong{84}(1), 3–37. \doi{10.1111/rssb.12454}.
+}
+\seealso{
+\code{\link[=epsdelta]{epsdelta()}} for constructing \eqn{(\varepsilon, \delta)}-DP trade-off functions with known parameters,
+\code{\link[=est_gdp]{est_gdp()}} for the analogous estimation problem in the Gaussian DP framework,
+\code{\link[=fdp]{fdp()}} for plotting and comparing trade-off functions.
+
+For lower bounding \eqn{\mu}-Gaussian Differential Privacy, see \code{\link[=gdp_to_epsdelta]{gdp_to_epsdelta()}} which uses exact theoretical results from the literature.
 }
