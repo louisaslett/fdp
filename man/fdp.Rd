@@ -26,8 +26,8 @@ Use \code{NULL} (default) for no title.}
 }}
 }
 \value{
-A \code{ggplot2} object displaying the supplied trade-off functions (and points, if applicable).
-It can be further modified with additional \code{ggplot2} layers.
+A \code{ggplot2} object of class \code{c("fdp_plot", "gg", "ggplot")} displaying the supplied trade-off functions (and points, if applicable).
+It can be further modified with additional \code{ggplot2} layers or combined with other \code{fdp_plot} objects using \code{+}.
 }
 \description{
 Produce a comparative plot of one or more (analytic or empirical) f-differential privacy trade-off functions.
@@ -171,6 +171,8 @@ fdp("Gaussian DP" = gdp(1),
     "Classical DP" = epsdelta(1, 0.1),
     .legend = "Methods")
 
+# Alternatively, combine separate fdp() calls using +
+fdp(gdp(1)) + fdp(epsdelta(1, 0.1))
 }
 \references{
 Andrew, A. M. (1979). “Another efficient algorithm for convex hulls in two dimensions”. \emph{Information Processing Letters}, \strong{9}(5), 216–219. \doi{10.1016/0020-0190(79)90072-3}.

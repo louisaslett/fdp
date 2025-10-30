@@ -147,8 +147,8 @@
 #'        }
 #'
 #' @return
-#' A `ggplot2` object displaying the supplied trade-off functions (and points, if applicable).
-#' It can be further modified with additional `ggplot2` layers.
+#' A `ggplot2` object of class `c("fdp_plot", "gg", "ggplot")` displaying the supplied trade-off functions (and points, if applicable).
+#' It can be further modified with additional `ggplot2` layers or combined with other `fdp_plot` objects using `+`.
 #'
 #' @export
 #'
@@ -167,6 +167,8 @@
 #'     "Classical DP" = epsdelta(1, 0.1),
 #'     .legend = "Methods")
 #'
+#' # Alternatively, combine separate fdp() calls using +
+#' fdp(gdp(1)) + fdp(epsdelta(1, 0.1))
 fdp <- function(..., .legend = NULL, .tol = sqrt(.Machine$double.eps)) {
   # Grid of alpha we evaluate on for function arguments
   alpha <- seq(0.0, 1.0, by = 0.01)
@@ -218,5 +220,121 @@ fdp <- function(..., .legend = NULL, .tol = sqrt(.Machine$double.eps)) {
     p <- p +
       ggplot2::geom_point(ggplot2::aes(x = .data$alpha, y = .data$beta, col = .data$item), pts[[i]], size = 0.5, shape = 4L, stroke = 1.5)
   }
-  p + ggplot2::scale_colour_discrete(name = .legend, breaks = nms)
+  p <- p + ggplot2::scale_colour_discrete(name = .legend, breaks = nms)
+
+  # Store processed data for future combination with other fdp plots
+  # Put fdp_plot class FIRST to ensure S3 method dispatch works before S7
+  class(p) <- c("fdp_plot", setdiff(class(p), "fdp_plot"))
+  attr(p, "fdp_data") <- x
+  attr(p, "fdp_legend") <- .legend
+  attr(p, "fdp_tol") <- .tol
+
+  p
+}
+
+#' Combine fdp plots
+#'
+#' @description
+#' Allows combining multiple `fdp()` plot objects using the `+` operator.
+#'
+#' @param e1 An `fdp_plot` object (the result of calling `fdp()`)
+#' @param e2 Either another `fdp_plot` object or a `ggplot2` layer
+#'
+#' @return
+#' If `e2` is an `fdp_plot`, returns a new combined `fdp_plot` object.
+#' If `e2` is a `ggplot2` layer, returns a modified `ggplot2` object.
+#'
+#' @export
+#'
+#' @examples
+#' # Combine two separate fdp() calls
+#' fdp(gdp(0.5)) + fdp(lap(1))
+#'
+#' # Can still add regular ggplot2 layers
+#' fdp(gdp(1)) + ggplot2::ggtitle("My Privacy Plot")
+#'
+#' # First legend naming takes precedence
+#' fdp(gdp(0.5), .legend = "First") + fdp(lap(1), .legend = "Second")
+#' # Later .legend arguments apply if none specified in prior calls
+#' fdp(gdp(0.5)) + fdp(lap(1), .legend = "Second")
+`+.fdp_plot` <- function(e1, e2) {
+  # If e2 is also an fdp_plot, combine them
+  if (inherits(e2, "fdp_plot")) {
+    # Extract data from both plots
+    data1 <- attr(e1, "fdp_data")
+    data2 <- attr(e2, "fdp_data")
+    legend1 <- attr(e1, "fdp_legend")
+    legend2 <- attr(e2, "fdp_legend")
+    tol <- attr(e1, "fdp_tol") # Use tolerance from first plot
+
+    # Use legend from second plot if first is NULL, otherwise keep first
+    final_legend <- if (is.null(legend1)) legend2 else legend1
+
+    # Combine the data lists
+    combined_data <- c(data1, data2)
+
+    # Deduplicate names in the combined data
+    combined_data <- deduplicate_names(combined_data)
+
+    # Rebuild the plot with combined data
+    p <- ggplot2::ggplot() +
+      ggplot2::lims(x = c(-0.01, 1.01), y = c(-0.01, 1.01)) +
+      ggplot2::coord_fixed(ratio = 1.0) +
+      ggplot2::geom_function(fun = \(xx) 1.0 - xx, linetype = 2L, colour = "grey", xlim = c(0.0, 1.0)) +
+      ggplot2::theme_minimal() +
+      ggplot2::labs(x = "Type-I error", y = "Type-II error")
+
+    lns <- pts <- list()
+    nms <- NULL
+    for (i in seq_along(combined_data)) {
+      nms <- c(nms, fdp_name(combined_data[[i]]))
+      if (attr(combined_data[[i]], "fdp_draw") == "point") {
+        # Points
+        if (!(attr(combined_data[[i]], "fdp_hide_point") %||% FALSE)) {
+          pts <- c(pts,
+                   list(cbind(item = fdp_name(combined_data[[i]]),
+                              combined_data[[i]])))
+        }
+        # Lower convex hull
+        lns <- c(lns,
+                 list(cbind(item = fdp_name(combined_data[[i]]),
+                            lower_hull(combined_data[[i]]))))
+      } else if (attr(combined_data[[i]], "fdp_draw") == "line") {
+        lns <- c(lns,
+                 list(cbind(item = fdp_name(combined_data[[i]]),
+                            combined_data[[i]])))
+      }
+    }
+    for (i in seq_along(lns)) {
+      p <- p +
+        ggplot2::geom_line(ggplot2::aes(x = .data$alpha, y = .data$beta, col = .data$item), lns[[i]])
+    }
+    for (i in seq_along(pts)) {
+      p <- p +
+        ggplot2::geom_point(ggplot2::aes(x = .data$alpha, y = .data$beta, col = .data$item), pts[[i]], size = 0.5, shape = 4L, stroke = 1.5)
+    }
+    p <- p + ggplot2::scale_colour_discrete(name = final_legend, breaks = nms)
+
+    # Store combined data for further combinations
+    # Put fdp_plot class FIRST to ensure S3 method dispatch works before S7
+    class(p) <- c("fdp_plot", setdiff(class(p), "fdp_plot"))
+    attr(p, "fdp_data") <- combined_data
+    attr(p, "fdp_legend") <- final_legend
+    attr(p, "fdp_tol") <- tol
+
+    return(p)
+  }
+
+  # Otherwise, fall back to default ggplot2 behavior
+  # (adding a regular ggplot2 layer to an fdp_plot)
+  # Remove fdp_plot class temporarily to allow ggplot2's + method to work
+  orig_class <- class(e1)
+  class(e1) <- setdiff(class(e1), "fdp_plot")
+  result <- e1 + e2
+  # Restore fdp_plot class and attributes
+  class(result) <- orig_class
+  attr(result, "fdp_data") <- attr(e1, "fdp_data")
+  attr(result, "fdp_legend") <- attr(e1, "fdp_legend")
+  attr(result, "fdp_tol") <- attr(e1, "fdp_tol")
+  result
 }
