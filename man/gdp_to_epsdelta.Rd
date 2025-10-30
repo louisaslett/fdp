@@ -2,29 +2,72 @@
 % Please edit documentation in R/gdp_to_epsdelta.R
 \name{gdp_to_epsdelta}
 \alias{gdp_to_epsdelta}
-\title{Exact (epsilon, delta)-differential privacy of GDP}
+\title{Convert Gaussian differential privacy to classical (epsilon, delta)-differential privacy}
 \usage{
 gdp_to_epsdelta(mu = 0.5, epsilon = 1, dp = NULL)
 }
 \arguments{
-\item{mu}{The parameter of GDP to match}
+\item{mu}{Numeric scalar specifying the \eqn{\mu} parameter of the Gaussian differential privacy mechanism.
+Must be non-negative.}
 
-\item{epsilon}{The fixed target epsilon to use, with bounding computed by finding delta.}
+\item{epsilon}{Numeric scalar specifying the target \eqn{\varepsilon} privacy parameter.
+Must be non-negative.
+The function computes the minimal \eqn{\delta} such that \eqn{\mu}-GDP implies \eqn{(\varepsilon, \delta)}-DP.}
 
-\item{dp}{The number of decimal places of accuracy to use when estimating the delta parameter.}
+\item{dp}{Optional integer specifying the number of decimal places for rounding the computed \eqn{\delta} value.
+If provided, \eqn{\delta} is rounded \emph{up} to ensure the privacy guarantee remains valid.
+If \code{NULL} (default), the exact value is returned without rounding.
+Must be a positive integer if specified.}
 }
 \value{
-An
+A \eqn{(\varepsilon, \delta)}-DP trade-off function object (see \code{\link[=epsdelta]{epsdelta()}}) of class \code{c("fdp_epsdelta_tradeoff", "function")}.
 }
 \description{
-Calculated exact (epsilon, delta)-differential privacy of a GDP using Corollary 1, p.16, in Dong et al. (2022).
+Computes the exact \eqn{(\varepsilon, \delta)}-differential privacy guarantee corresponding to a given \eqn{\mu}-Gaussian differential privacy (GDP) mechanism for a specified \eqn{\varepsilon} value.
+This conversion is based on the closed-form relationship established in Corollary 1 (p.16) of Dong et al. (2022), which provides the tightest possible \eqn{\delta} for any given \eqn{\varepsilon} and \eqn{\mu}.
 }
 \details{
-TODO description
+While GDP provides a complete characterisation of privacy through the trade-off function, classical \eqn{(\varepsilon, \delta)}-differential privacy remains the most widely recognised privacy definition in both theoretical and applied research.
+This function enables practitioners to translate GDP guarantees into the more familiar \eqn{(\varepsilon, \delta)}-DP language.
+
+For a mechanism satisfying \eqn{\mu}-GDP, the exact \eqn{(\varepsilon, \delta)}-DP guarantee is given by Corollary 1 of Dong et al. (2022):
+\deqn{\delta(\varepsilon, \mu) = \Phi\left(-\frac{\varepsilon}{\mu} + \frac{\mu}{2}\right) - e^\varepsilon \Phi\left(-\frac{\varepsilon}{\mu} - \frac{\mu}{2}\right)}
+where \eqn{\Phi} denotes the cumulative distribution function of the standard Normal distribution.
+This was a result originally proved in Balle and Wang (2018).
 }
 \examples{
-#gdp(0.5)
+# Convert mu = 1 GDP to (epsilon, delta)-DP with epsilon = 1
+dp_guarantee <- gdp_to_epsdelta(mu = 1.0, epsilon = 1.0)
+dp_guarantee
+
+# Round delta to 6 decimal places for reporting
+dp_rounded <- gdp_to_epsdelta(mu = 1.0, epsilon = 1.0, dp = 6)
+dp_rounded
+
+# Compare the original GDP with its (epsilon, delta)-DP representation
+fdp(gdp(1.0),
+    gdp_to_epsdelta(mu = 1.0, epsilon = 1.0),
+    .legend = "Privacy Mechanism")
+
+# Explore how delta varies with epsilon for a fixed mu
+mu_fixed <- 1.0
+epsilons <- c(0.1, 0.5, 1.0, 2.0)
+
+res <- fdp(gdp(mu_fixed))
+for (eps in epsilons) {
+  res <- res+fdp(gdp_to_epsdelta(mu = mu_fixed, epsilon = eps))
+}
+res
 }
 \references{
+Balle, B. and Wang, Y-X. (2018). “Improving the Gaussian Mechanism for Differential Privacy: Analytical Calibration and Optimal Denoising”. \emph{Proceedings of the 35th International Conference on Machine Learning}, \strong{80}, 394–403. Available at: \url{https://proceedings.mlr.press/v80/balle18a.html}.
+
 Dong, J., Roth, A. and Su, W.J. (2022). “Gaussian Differential Privacy”. \emph{Journal of the Royal Statistical Society Series B}, \strong{84}(1), 3–37. \doi{10.1111/rssb.12454}.
+}
+\seealso{
+\code{\link[=gdp]{gdp()}} for constructing Gaussian differential privacy trade-off functions,
+\code{\link[=epsdelta]{epsdelta()}} for directly constructing \eqn{(\varepsilon, \delta)}-DP trade-off functions,
+\code{\link[=est_gdp]{est_gdp()}} for estimating \eqn{\mu} from empirical trade-off functions,
+\code{\link[=est_epsdelta]{est_epsdelta()}} for estimating \eqn{(\varepsilon, \delta)} from empirical trade-off functions,
+\code{\link[=fdp]{fdp()}} for plotting and comparing trade-off functions.
 }
