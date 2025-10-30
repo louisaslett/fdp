@@ -52,7 +52,7 @@ preprocess_args <- function(args, alpha, tol = sqrt(.Machine$double.eps)) {
                                            ">" = e[["message"]]),
                                          call = parent.frame(5L))
                         })
-        res <- copy_atts(res, env$fdp_function_to_call) # Need to see if attributes were set on the function, rather than output of function and copy over (without overwriting)
+        res <- copy_atts(res, env$fdp_function_to_call, overwrite = TRUE) # Need to see if attributes were set on the function, rather than output of function and copy over (with overwriting to prioritize user-set attributes)
         res2 <- fixup_type(res, alpha)
         res2 <- copy_atts(res2, res)
         res2 <- fixup_name_draw(res2, nm, arg)
@@ -101,7 +101,7 @@ preprocess_args <- function(args, alpha, tol = sqrt(.Machine$double.eps)) {
                                            ">" = e[["message"]]),
                                          call = parent.frame(5L))
                         })
-        res <- copy_atts(res, env$fdp_function_to_call) # Need to see if attributes were set on the function, rather than output of function and copy over (without overwriting)
+        res <- copy_atts(res, env$fdp_function_to_call, overwrite = TRUE) # Need to see if attributes were set on the function, rather than output of function and copy over (with overwriting to prioritize user-set attributes)
       }
       res2 <- fixup_type(res, alpha)
       res2 <- copy_atts(res2, res)
