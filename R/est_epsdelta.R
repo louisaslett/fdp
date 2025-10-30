@@ -61,7 +61,8 @@
 #'        Default is `2L`.
 #'
 #' @return
-#' A function of class `c("fdp_epsdelta_tradeoff", "function")`, as returned by [epsdelta()], representing the tightest \eqn{(\varepsilon, \delta)}-DP trade-off function that lower bounds the input `x`.
+#' A \eqn{(\varepsilon, \delta)}-DP trade-off function object (see [epsdelta()]) of class `c("fdp_epsdelta_tradeoff", "function")`.
+#' This represents the tightest \eqn{(\varepsilon, \delta)}-DP trade-off function that lower bounds the input `x`.
 #'
 #' @seealso
 #' [epsdelta()] for constructing \eqn{(\varepsilon, \delta)}-DP trade-off functions with known parameters,

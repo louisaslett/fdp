@@ -30,7 +30,8 @@ Must be a non-negative integer.
 Default is \code{2L}.}
 }
 \value{
-A function of class \code{c("fdp_epsdelta_tradeoff", "function")}, as returned by \code{\link[=epsdelta]{epsdelta()}}, representing the tightest \eqn{(\varepsilon, \delta)}-DP trade-off function that lower bounds the input \code{x}.
+A \eqn{(\varepsilon, \delta)}-DP trade-off function object (see \code{\link[=epsdelta]{epsdelta()}}) of class \code{c("fdp_epsdelta_tradeoff", "function")}.
+This represents the tightest \eqn{(\varepsilon, \delta)}-DP trade-off function that lower bounds the input \code{x}.
 }
 \description{
 Estimates the \eqn{(\varepsilon, \delta)}-differential privacy parameters that lower bound a given set of empirical trade-off points.
