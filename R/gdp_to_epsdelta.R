@@ -60,7 +60,7 @@
 #' # Explore how delta varies with epsilon for a fixed mu
 #' mu_fixed <- 1.0
 #' epsilons <- c(0.1, 0.5, 1.0, 2.0)
-#' 
+#'
 #' res <- fdp(gdp(mu_fixed))
 #' for (eps in epsilons) {
 #'   res <- res+fdp(gdp_to_epsdelta(mu = mu_fixed, epsilon = eps))
