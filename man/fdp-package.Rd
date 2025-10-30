@@ -16,7 +16,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Louis Aslett \email{louis.aslett@durham.ac.uk} (\href{https://orcid.org/0000-0003-2211-233X}{ORCID})
+\strong{Maintainer}: Louis Aslett \email{louis.aslett@durham.ac.uk} (\href{https://orcid.org/0000-0003-2211-233X}{ORCID}) [copyright holder]
 
 }
 \keyword{internal}
