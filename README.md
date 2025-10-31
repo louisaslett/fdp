@@ -11,7 +11,7 @@ At present it hopefully helps researchers in the area quickly produce the $f$-DP
 Please cite this software if you use it.
 
 The package is based on the $f$-differential privacy/Gaussian differential privacy framework introduced by Dong, Roth, and Su (2022) in "Gaussian Differential Privacy" (_Journal of the Royal Statistical Society Series B_, <https://doi.org/10.1111/rssb.12454>).
-A nice overview of Gaussian differential privacy is available in Gomez _et al._ (2025) <http://arxiv.org/abs/2503.10945>.
+A nice overview of Gaussian differential privacy is available in Gomez _et al._ (2025) <https://arxiv.org/abs/2503.10945>.
 
 ## Installation
 
