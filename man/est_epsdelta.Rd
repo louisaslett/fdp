@@ -45,16 +45,12 @@ This function numerically solves an inverse problem in the f-differential privac
 As such, the \eqn{(\varepsilon, \delta)} found ought best to be viewed as an approximate lower bound on the true values, since there could be intermediate trade-off points that are not supplied which cause the true values to be larger.
 For example, consider:
 
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{est_epsdelta(gdp(0.5)(), delta = 0)
-#> (ε, δ)-Differential Privacy Trade-off Function
-#>   Parameters:
-#>     ε = 1.45
-#>     δ = 0
+\if{html}{\out{<div class="sourceCode">}}\preformatted{est_epsdelta(gdp(0.5)(), delta = 0)
 }\if{html}{\out{</div>}}
 
-Corollary 1, p.16, in Dong et al. (2022) means the exact answer here is \eqn{(\varepsilon = 1.45, \delta = 0.000544\dots)} and that indeed there does not in general exist any finite \eqn{\varepsilon} solution for \eqn{\delta = 0}.
+This code will return \eqn{\varepsilon=1.45}, yet Corollary 1, p.16, in Dong et al. (2022) means the exact answer here is \eqn{(\varepsilon = 1.45, \delta = 0.000544\dots)} and that indeed there does not in general exist any finite \eqn{\varepsilon} solution for \eqn{\delta = 0}.
 
-\strong{Note:} in fact, for lower bounding \eqn{\mu}-Gaussian Differential Privacy one should use \code{\link[=gdp_to_epsdelta]{gdp_to_epsdelta()}} which employs exact theoretical results from the literature!
+\strong{Note:} for lower bounding \eqn{\mu}-Gaussian Differential Privacy one should use \code{\link[=gdp_to_epsdelta]{gdp_to_epsdelta()}} instead, which employs exact theoretical results from the literature!
 
 This function may be useful for post-hoc privacy auditing, privacy budget allocation, or mechanism comparison.
 \subsection{Mathematical formulation}{

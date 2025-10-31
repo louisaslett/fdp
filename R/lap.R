@@ -15,15 +15,15 @@
 #'
 #' Laplace differential privacy arises as the trade-off function corresponding to distinguishing between two Laplace distributions with unit scale parameter and locations differing by \eqn{\mu}.
 #' Without loss of generality, the trade-off function is therefore,
-#' \deqn{L_\mu \coloneqq T\left(\text{Lap}(0, 1), \text{Lap}(\mu, 1)\right) \quad\text{for}\quad \mu \ge 0.}
+#' \deqn{L_\mu := T\left(\text{Lap}(0, 1), \text{Lap}(\mu, 1)\right) \quad\text{for}\quad \mu \ge 0.}
 #'
 #' The most natural way to satisfy \eqn{\mu}-Laplace DP is by adding Laplace noise to construct the randomised algorithm.
 #' This is the canonical noise mechanism used in classical \eqn{\varepsilon}-differential privacy.
 #' Let \eqn{\theta(S)} be the statistic of the data \eqn{S} which is to be released.
 #' Then the *Laplace mechanism* is defined to be
-#' \deqn{M(S) \coloneqq \theta(S) + \eta}
+#' \deqn{M(S) := \theta(S) + \eta}
 #' where \eqn{\eta \sim \text{Lap}(0, \Delta(\theta) / \mu)} and,
-#' \deqn{\Delta(\theta) \coloneqq \sup_{S, S'} |\theta(S) - \theta(S')|}
+#' \deqn{\Delta(\theta) := \sup_{S, S'} |\theta(S) - \theta(S')|}
 #' the supremum being taken over neighbouring data sets.
 #' The randomised algorithm \eqn{M(\cdot)} is then a \eqn{\mu}-Laplace DP release of \eqn{\theta(S)}.
 #' In the classical regime, this corresponds to the Laplace mechanism which satisfies \eqn{(\varepsilon=\mu)}-differential privacy (Dwork et al., 2006).
@@ -56,7 +56,7 @@
 #' [fdp()] for plotting trade-off functions.
 #'
 #' Additional trade-off functions can be found in
-#' [gdp()] for Gaussian differential privacy, and
+#' [gdp()] for Gaussian differential privacy, and in
 #' [epsdelta()] for classical \eqn{(\varepsilon, \delta)}-differential privacy.
 #'
 #' @export

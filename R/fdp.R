@@ -105,7 +105,9 @@
 #'
 #' # Formal definition (Dong et al., 2022)
 #'
-#' For any two probability distributions \eqn{P} and \eqn{Q} on the same space, the trade-off function \eqn{T(P,Q) \colon [0,1] \to [0,1]} characterises the optimal relationship between Type I and Type II errors in a hypothesis test distinguishing between them. It is defined as:
+#' For any two probability distributions \eqn{P} and \eqn{Q} on the same space, the trade-off function
+#' \deqn{T(P,Q) \colon [0,1] \to [0,1]}
+#' characterises the optimal relationship between Type I and Type II errors in a hypothesis test distinguishing between them. It is defined as:
 #' \deqn{T(P, Q)(\alpha) = \inf \left\{ \beta_\phi \colon \alpha_\phi \leq \alpha \right\}}
 #' where the infimum is taken over all measurable rejection rules \eqn{\phi}.
 #' The terms \eqn{\alpha_\phi = \mathbb{E}_P[\phi]} and \eqn{\beta_\phi = 1 - \mathbb{E}_Q[\phi]} represent the Type I and Type II errors, respectively.

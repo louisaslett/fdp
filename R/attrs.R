@@ -21,8 +21,8 @@
 #' * `fdp_attributes()` retrieves all f-DP related attributes attached to an object.
 #'
 #' By default, [fdp()] automatically determines the rendering method: data frames or vectors
-#' with ≥100 elements are treated as lines (with convexity validation), while those with
-#' <100 elements are treated as points (with lower hull computation).
+#' with \eqn{\ge 100} elements are treated as lines (with convexity validation), while those with
+#' \eqn{< 100} elements are treated as points (with lower hull computation).
 #'
 #' @param x
 #'        An f-DP object (function, data frame, or vector) to which attributes are added or retrieved.

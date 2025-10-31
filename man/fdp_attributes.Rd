@@ -44,8 +44,8 @@ it sets the label; when called without \code{nm}, it returns the current label.
 }
 
 By default, \code{\link[=fdp]{fdp()}} automatically determines the rendering method: data frames or vectors
-with ≥100 elements are treated as lines (with convexity validation), while those with
-<100 elements are treated as points (with lower hull computation).
+with \eqn{\ge 100} elements are treated as lines (with convexity validation), while those with
+\eqn{< 100} elements are treated as points (with lower hull computation).
 }
 \details{
 Functions to control how f-differential privacy trade-off functions and empirical

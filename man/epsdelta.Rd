@@ -15,7 +15,7 @@ Must be in \eqn{[0, 1]}.
 Default is \code{0.0} (pure \eqn{\varepsilon}-DP).}
 }
 \value{
-A function of class \code{c("fdp_epsdelta_tradeoff", "function")} that computes the \eqn{(\varepsilon, \delta)}-DP trade-off function.
+A function of class \code{c("fdp_epsdelta_tradeoff", "function")} which computes the \eqn{(\varepsilon, \delta)}-DP trade-off function.
 
 When called:
 \itemize{
@@ -41,7 +41,9 @@ This function can be called with or without arguments supplied, either to obtain
 Classical \eqn{(\varepsilon, \delta)}-differential privacy (Dwork et al., 2006a,b) states that a randomised mechanism \eqn{M} satisfies \eqn{(\varepsilon, \delta)}-DP if for all neighbouring datasets \eqn{S} and \eqn{S'} that differ in a single observation, and any event \eqn{E},
 \deqn{\mathbb{P}(M(S) \in E) \le e^\varepsilon \mathbb{P}[M(S') \in E] + \delta}
 
-In the f-DP framework (Dong et al., 2022), this corresponds to a specific trade-off function \eqn{f_{\varepsilon,\delta} \colon [0,1] \to [0,1]} which maps Type-I error rates \eqn{\alpha} to the minimum achievable Type-II error rates \eqn{\beta} when distinguishing between the output distributions \eqn{M(S)} and \eqn{M(S')}.
+In the f-DP framework (Dong et al., 2022), this corresponds to a specific trade-off function,
+\deqn{f_{\varepsilon,\delta} \colon [0,1] \to [0,1]}
+which maps Type-I error rates \eqn{\alpha} to the minimum achievable Type-II error rates \eqn{\beta} when distinguishing between the output distributions \eqn{M(S)} and \eqn{M(S')}.
 
 The special case \eqn{\delta = 0} corresponds to pure \eqn{\varepsilon}-differential privacy, where the trade-off function has no fixed disclosure risk.
 }

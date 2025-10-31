@@ -33,7 +33,7 @@ This function can be called with or without argument supplied, either to obtain 
 \section{Formal definition}{
 Gaussian differential privacy (Dong et al., 2022) arises as the trade-off function corresponding to distinguishing between two Normal distributions with unit variance and means differing by \eqn{\mu}.
 Without loss of generality, the trade-off function is therefore,
-\deqn{G_\mu \coloneqq T\left(N(0, 1), N(\mu, 1)\right) \quad\text{for}\quad \mu \ge 0.}
+\deqn{G_\mu := T\left(N(0, 1), N(\mu, 1)\right) \quad\text{for}\quad \mu \ge 0.}
 This leads to,
 \deqn{G_\mu(\alpha) = \Phi\left(\Phi^{-1}(1-\alpha)-\mu\right)}
 where \eqn{\Phi} is the standard Normal cumulative distribution function.
@@ -41,9 +41,9 @@ where \eqn{\Phi} is the standard Normal cumulative distribution function.
 The most natural way to satisfy \eqn{\mu}-GDP is by adding Gaussian noise to construct the randomised algorithm.
 Theorem 1 in Dong et al. (2022) identifies the correct variance of that noise for a given sensitivity of the statistic to be released.
 Let \eqn{\theta(S)} be the statistic of the data \eqn{S} which is to be released. Then the \emph{Gaussian mechanism} is defined to be
-\deqn{M(S) \coloneqq \theta(S) + \eta}
+\deqn{M(S) := \theta(S) + \eta}
 where \eqn{\eta \sim N(0, \Delta(\theta)^2 / \mu^2)} and,
-\deqn{\Delta(\theta) \coloneqq \sup_{S, S'} |\theta(S) - \theta(S')|}
+\deqn{\Delta(\theta) := \sup_{S, S'} |\theta(S) - \theta(S')|}
 the supremum being taken over neighbouring data sets.
 The randomised algorithm \eqn{M(\cdot)} is then a \eqn{\mu}-GDP release of \eqn{\theta(S)}.
 
