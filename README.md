@@ -1,4 +1,4 @@
-# 📦 `{fdp}` R package <img src="man/figures/logo.jpg" align="right" height="278" alt="" />
+# 📦 `{fdp}` R package <img src="man/figures/logo.png" align="right" height="278" alt="" />
 
 [![Project Status](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![License](https://img.shields.io/badge/license-GPL%20%28%3E%3D%203%29-brightgreen.svg?style=flat)](https://www.gnu.org/licenses/gpl-2.0.html)

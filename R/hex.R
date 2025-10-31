@@ -1,5 +1,5 @@
 make_hex <- function() {
-  imgurl <- system.file("fdp_img.jpg", package = "fdp")
+  imgurl <- system.file("fdp_img.png", package = "fdp")
   hexSticker::sticker(imgurl,
                       s_x = 1.06,
                       s_y = 1.0,
@@ -22,7 +22,7 @@ make_hex <- function() {
                       u_y = 0.6,
                       u_angle = 90.0,
                       white_around_sticker = TRUE,
-                      filename = file.path("inst", "fdp_hex.jpg"),
+                      filename = file.path("inst", "fdp_hex.png"),
                       dpi = 600L)
-  usethis::use_logo(file.path("inst", "fdp_hex.jpg"), geometry = "480x556")
+  usethis::use_logo(file.path("inst", "fdp_hex.png"), geometry = "480x556")
 }
