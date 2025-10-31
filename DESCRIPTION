@@ -11,6 +11,8 @@ Description: Constructs and visualises trade-off functions for f-differential
     (epsilon, delta)-differential privacy, and accepts user-specified optimal
     type I / type II errors from which the lower convex hull trade-off function
     is automatically constructed.
+URL: https://fdp.louisaslett.com/
+BugReports: https://github.com/louisaslett/fdp/issues
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -20,5 +22,3 @@ Imports:
     cli,
     ggplot2,
     rlang
-URL: https://github.com/louisaslett/fdp
-BugReports: https://github.com/louisaslett/fdp/issues

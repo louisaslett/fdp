@@ -10,7 +10,7 @@ Constructs and visualises trade-off functions for f-differential privacy (f-DP) 
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/louisaslett/fdp}
+  \item \url{https://fdp.louisaslett.com/}
   \item Report bugs at \url{https://github.com/louisaslett/fdp/issues}
 }
 
