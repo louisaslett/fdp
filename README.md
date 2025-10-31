@@ -1,8 +1,10 @@
-# 📦 `{fdp}` R package
+# 📦 `{fdp}` R package <img src="man/figures/logo.jpg" align="right" height="278" alt="" />
 
-[![Project Status](https://www.repostatus.org/badges/latest/concept.svg)](https://www.repostatus.org/#concept)
+[![Project Status](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![License](https://img.shields.io/badge/license-GPL%20%28%3E%3D%203%29-brightgreen.svg?style=flat)](https://www.gnu.org/licenses/gpl-2.0.html)
-[![fdp status badge](https://louisaslett.r-universe.dev/badges/fdp)](https://louisaslett.r-universe.dev/fdp)
+[![CRAN version](https://www.r-pkg.org/badges/version/fdp)](https://cran.r-project.org/package=fdp)
+[![CRAN downloads](https://cranlogs.r-pkg.org/badges/grand-total/fdp)](https://cran.r-project.org/package=fdp)
+[![R-universe status badge](https://louisaslett.r-universe.dev/badges/fdp)](https://louisaslett.r-universe.dev/fdp)
 
 The `{fdp}` package provides tools for working with $f$-differential privacy, a powerful framework that generalises traditional differential privacy definitions.
 The package allows you to construct, visualise, and analyse trade-off functions that show the optimal relationship between Type I and Type II errors when distinguishing between outputs from neighboring datasets.
